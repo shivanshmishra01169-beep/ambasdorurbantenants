@@ -1,0 +1,489 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — CampusCrew{% endblock %}
+{% block extra_css %}
+<style>
+{% if app.team == 'technical' %}:root { --tc: #2563eb; --tg: rgba(37,99,235,0.10); }
+{% elif app.team == 'marketing' %}:root { --tc: #ea8c00; --tg: rgba(234,140,0,0.10); }
+{% else %}:root { --tc: #0d9488; --tg: rgba(13,148,136,0.10); }{% endif %}
+
+.page { padding: 2rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+.dash-header { margin-bottom: 2rem; }
+.dash-header .welcome { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.3rem; }
+.dash-header h1 { font-size: 1.8rem; font-weight: 700; }
+.dash-header h1 span { color: var(--tc); }
+
+/* HERO: TOP PERFORMERS */
+.hero-performers {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border); border-radius: 24px;
+    padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden;
+    box-shadow: 0 4px 24px rgba(15,39,66,0.05);
+}
+.hero-performers::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--tc), color-mix(in srgb, var(--tc) 50%, #fff));
+}
+.hero-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem; }
+.hero-head h2 { font-size: 1.3rem; font-weight: 700; }
+.hero-head .hero-subtitle { color: var(--text-muted); font-size: 0.88rem; margin-top: 0.2rem; }
+.hero-badge { font-family: var(--mono); font-size: 0.75rem; color: var(--tc);
+    background: var(--tg); border: 1px solid color-mix(in srgb, var(--tc) 30%, transparent);
+    border-radius: 6px; padding: 0.25rem 0.6rem; }
+.hero-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+@media(max-width: 700px) { .hero-grid { grid-template-columns: 1fr; } }
+.hero-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+    padding: 1.5rem 1.2rem; text-align: center; position: relative;
+    transition: transform 0.2s; overflow: hidden;
+}
+.hero-card:hover { transform: translateY(-3px); }
+.hero-card.rank-1 { border-color: var(--gold); box-shadow: 0 8px 28px rgba(245,158,11,0.18); order: 2; }
+.hero-card.rank-2 { order: 1; }
+.hero-card.rank-3 { order: 3; }
+@media(min-width: 701px) {
+    .hero-grid { align-items: end; }
+    .hero-card.rank-1 { padding-top: 1.8rem; padding-bottom: 1.8rem; }
+}
+.hero-medal { font-size: 1.6rem; margin-bottom: 0.6rem; }
+.hero-photo-wrap { position: relative; display: inline-block; margin-bottom: 1rem; }
+.hero-photo {
+    width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+    border: 4px solid var(--tc); display: block;
+}
+.hero-card.rank-1 .hero-photo { width: 160px; height: 160px; border-color: var(--gold); }
+.hero-photo-ph {
+    width: 130px; height: 130px; border-radius: 50%; background: var(--tg);
+    border: 4px solid var(--tc); display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem;
+}
+.hero-card.rank-1 .hero-photo-ph { width: 160px; height: 160px; border-color: var(--gold); font-size: 3rem; }
+.hero-rank-tag {
+    position: absolute; bottom: -6px; right: -6px;
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.95rem; font-family: var(--mono);
+    border: 3px solid var(--surface);
+}
+.hero-rank-tag.r1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+.hero-rank-tag.r2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #fff; }
+.hero-rank-tag.r3 { background: linear-gradient(135deg, #b45309, #92400e); color: #fde68a; }
+.hero-name { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.2rem; }
+.hero-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.7rem; }
+.hero-points { font-family: var(--mono); font-weight: 700; color: var(--tc); font-size: 1.3rem; }
+.hero-points-lbl { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.hero-empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); }
+.hero-empty .hero-empty-icon { font-size: 2.8rem; margin-bottom: 0.7rem; }
+
+.dash-grid { display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start; }
+@media(max-width: 800px) { .dash-grid { grid-template-columns: 1fr; } }
+
+/* CREW ID CARD */
+.crew-card {
+    background: var(--surface);
+    border: 1px solid var(--tc); border-radius: 20px;
+    overflow: hidden; position: relative;
+    box-shadow: 0 4px 24px var(--tg);
+}
+.crew-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--tc), color-mix(in srgb, var(--tc) 60%, #fff));
+}
+.card-bg { position: absolute; top: 0; right: 0; width: 60%; height: 100%;
+    background: radial-gradient(ellipse at 80% 30%, var(--tg) 0%, transparent 70%); pointer-events: none; }
+.card-body { padding: 1.5rem; position: relative; z-index: 1; }
+.card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+.card-org { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); }
+.card-org span { color: var(--tc); }
+.status-badge {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; border-radius: 100px; padding: 0.2rem 0.6rem;
+}
+.status-pending { background: rgba(234,140,0,0.10); color: #b45309; border: 1px solid rgba(234,140,0,0.3); }
+.status-approved { background: rgba(13,148,136,0.10); color: #0d9488; border: 1px solid rgba(13,148,136,0.3); }
+.status-rejected { background: rgba(220,38,38,0.08); color: #b91c1c; border: 1px solid rgba(220,38,38,0.3); }
+.card-main { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1.2rem; }
+.card-photo { width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 2px solid var(--tc); flex-shrink: 0; }
+.card-photo-ph { width: 72px; height: 72px; border-radius: 12px; background: var(--tg);
+    border: 2px solid var(--tc); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
+.card-name { font-size: 1.1rem; font-weight: 700; }
+.card-sub { color: var(--text-muted); font-size: 0.82rem; margin-top: 0.2rem; line-height: 1.5; }
+.card-team { color: var(--tc); font-size: 0.82rem; font-weight: 600; margin-top: 0.4rem; }
+.id-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.id-item .id-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.3rem; }
+.id-value {
+    font-family: var(--mono); font-size: 0.8rem; font-weight: 700; color: var(--tc);
+    background: color-mix(in srgb, var(--tc) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tc) 22%, transparent);
+    padding: 0.35rem 0.6rem; border-radius: 6px;
+    cursor: pointer; transition: all 0.2s; word-break: break-all;
+    display: flex; align-items: center; justify-content: space-between; gap: 4px;
+}
+.id-value:hover { background: color-mix(in srgb, var(--tc) 18%, transparent); }
+.id-copy { font-size: 0.7rem; opacity: 0.5; flex-shrink: 0; }
+
+/* Stats */
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.8rem; }
+.stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem; text-align: center; }
+.stat-val { font-size: 1.4rem; font-weight: 700; color: var(--tc); font-family: var(--mono); }
+.stat-lbl { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.2rem; }
+
+/* Right column */
+.right-col { display: flex; flex-direction: column; gap: 1.2rem; }
+
+/* Leaderboard */
+.leaderboard {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+}
+.lb-header {
+    padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.lb-header h2 { font-size: 1rem; font-weight: 700; }
+.lb-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; }
+.lb-badge { font-family: var(--mono); font-size: 0.72rem; color: var(--tc);
+    background: var(--tg); border: 1px solid color-mix(in srgb, var(--tc) 30%, transparent);
+    border-radius: 6px; padding: 0.2rem 0.5rem; }
+.lb-list { padding: 0.75rem 1rem; }
+.lb-item {
+    display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0.5rem;
+    border-bottom: 1px solid var(--border); transition: background 0.2s;
+    border-radius: 10px;
+}
+.lb-item:last-child { border-bottom: none; }
+.lb-item:hover { background: var(--surface2); }
+.lb-rank {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1rem; flex-shrink: 0;
+    font-family: var(--mono);
+}
+.rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+.rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #fff; }
+.rank-3 { background: linear-gradient(135deg, #b45309, #92400e); color: #fde68a; }
+.lb-photo {
+    width: 48px; height: 48px; border-radius: 50%;
+    object-fit: cover; border: 2px solid var(--border); flex-shrink: 0;
+}
+.lb-photo-ph {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--surface2); border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; flex-shrink: 0;
+}
+.lb-info { flex: 1; }
+.lb-name { font-weight: 600; font-size: 0.95rem; }
+.lb-meta { font-size: 0.78rem; color: var(--text-muted); }
+.lb-points {
+    font-family: var(--mono); font-weight: 700; color: var(--tc);
+    font-size: 1.1rem;
+}
+.lb-pts-label { font-size: 0.65rem; color: var(--text-muted); text-align: right; }
+.lb-empty { padding: 2rem; text-align: center; color: var(--text-muted); }
+.lb-empty .lb-empty-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.lb-empty p { font-size: 0.9rem; }
+
+/* Profile info card */
+.info-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 1.5rem;
+}
+.info-card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+.info-row { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.info-item { flex: 1; min-width: 130px; }
+.info-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.3rem; }
+.info-val { font-size: 0.9rem; font-weight: 500; }
+.info-link { color: var(--tc); text-decoration: none; font-size: 0.88rem; }
+.info-link:hover { text-decoration: underline; }
+
+/* Referral card */
+.referral-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 1.5rem;
+}
+.referral-card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+.referral-card p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem; }
+.share-row { display: flex; gap: 0.5rem; }
+.share-input {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.65rem 1rem;
+    color: var(--tc); font-family: var(--mono); font-size: 0.9rem;
+    font-weight: 700; cursor: pointer;
+}
+.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    background: var(--surface); border: 1px solid var(--tc); color: var(--tc);
+    padding: 0.7rem 1.5rem; border-radius: 100px;
+    font-size: 0.85rem; font-weight: 600; font-family: var(--mono);
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    box-shadow: 0 4px 16px rgba(15,39,66,0.1); }
+.toast.show { opacity: 1; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page">
+    <div class="dash-header">
+        <div class="welcome">Crew Dashboard</div>
+        <h1>Hey, <span>{{ profile.full_name.split.0 }}</span> 👋</h1>
+    </div>
+
+    <!-- HERO SECTION: TOP PERFORMERS WITH BIG PHOTOS -->
+    <div class="hero-performers">
+        <div class="hero-head">
+            <div>
+                <h2>🏆 Top Performers</h2>
+                <div class="hero-subtitle">
+                    {{ profile.college_name }} ·
+                    {% if app.team == 'technical' %}Tech Team
+                    {% elif app.team == 'marketing' %}Marketing Team
+                    {% else %}Accommodation Partners{% endif %}
+                </div>
+            </div>
+            <div class="hero-badge">Reward Points</div>
+        </div>
+
+        {% if top_performers %}
+        <div class="hero-grid">
+            {% for performer in top_performers %}
+            <div class="hero-card rank-{{ forloop.counter }}">
+                <div class="hero-photo-wrap">
+                    {% if performer.profile_photo %}
+                        <img src="{{ performer.profile_photo.url }}" class="hero-photo" alt="{{ performer.user.profile.full_name }}">
+                    {% else %}
+                        <div class="hero-photo-ph">
+                            {% if performer.team == 'technical' %}💻
+                            {% elif performer.team == 'marketing' %}📣
+                            {% else %}🏠{% endif %}
+                        </div>
+                    {% endif %}
+                    <div class="hero-rank-tag r{{ forloop.counter }}">
+                        {% if forloop.counter == 1 %}🥇
+                        {% elif forloop.counter == 2 %}🥈
+                        {% else %}🥉{% endif %}
+                    </div>
+                </div>
+                <div class="hero-name">{{ performer.user.profile.full_name }}</div>
+                <div class="hero-meta">{{ performer.user.profile.branch }} · {{ performer.user.profile.get_year_display }}</div>
+                <div class="hero-points">{{ performer.reward_points }}</div>
+                <div class="hero-points-lbl">points</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="hero-empty">
+            <div class="hero-empty-icon">🚀</div>
+            <p>You could be the first! No performers yet from your college.<br>
+            <strong style="color:var(--tc);">Get to the top!</strong></p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="dash-grid">
+        <!-- LEFT: Crew ID Card -->
+        <div>
+            <div class="crew-card">
+                <div class="card-bg"></div>
+                <div class="card-body">
+                    <div class="card-top">
+                        <div class="card-org">🎓 Campus<span>Crew</span></div>
+                        <div class="status-badge status-{{ app.status }}">
+                            {% if app.status == 'pending' %}⏳ Pending
+                            {% elif app.status == 'approved' %}✅ Approved
+                            {% else %}❌ Rejected{% endif %}
+                        </div>
+                    </div>
+                    <div class="card-main">
+                        {% if app.profile_photo %}
+                            <img src="{{ app.profile_photo.url }}" class="card-photo" alt="{{ profile.full_name }}">
+                        {% else %}
+                            <div class="card-photo-ph">👤</div>
+                        {% endif %}
+                        <div>
+                            <div class="card-name">{{ profile.full_name }}</div>
+                            <div class="card-sub">{{ profile.college_name }}<br>{{ profile.branch }} · {{ profile.get_year_display }}</div>
+                            <div class="card-team">
+                                {% if app.team == 'technical' %}💻 Tech Team
+                                {% elif app.team == 'marketing' %}📣 Marketing Team
+                                {% else %}🏠 Accommodation Partner{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="id-grid">
+                        <div class="id-item">
+                            <div class="id-label">Crew ID</div>
+                            <div class="id-value" onclick="copyText('{{ app.crew_id }}', this)">
+                                <span>{{ app.crew_id }}</span>
+                                <span class="id-copy">📋</span>
+                            </div>
+                        </div>
+                        <div class="id-item">
+                            <div class="id-label">Referral Code</div>
+                            <div class="id-value" onclick="copyText('{{ app.referral_code }}', this)">
+                                <span>{{ app.referral_code }}</span>
+                                <span class="id-copy">📋</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-box">
+                            <div class="stat-val">{{ app.referral_count }}</div>
+                            <div class="stat-lbl">Referrals</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-val">{{ app.reward_points }}</div>
+                            <div class="stat-lbl">Points</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="info-card" style="margin-top: 1.2rem;">
+                <h2>📋 Profile Details</h2>
+                <div class="info-row">
+                    <div class="info-item">
+                        <div class="info-label">College</div>
+                        <div class="info-val">{{ profile.college_name }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">City</div>
+                        <div class="info-val">{{ profile.city }}</div>
+                    </div>
+                </div>
+                <div class="info-row" style="margin-top: 0.8rem;">
+                    <div class="info-item">
+                        <div class="info-label">Branch & Year</div>
+                        <div class="info-val">{{ profile.branch }} · {{ profile.get_year_display }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">WhatsApp</div>
+                        <div class="info-val">{{ app.whatsapp }}</div>
+                    </div>
+                </div>
+                {% if profile.github_url or profile.linkedin_url %}
+                <div class="info-row" style="margin-top: 0.8rem;">
+                    {% if profile.github_url %}
+                    <div class="info-item">
+                        <div class="info-label">GitHub</div>
+                        <a href="{{ profile.github_url }}" target="_blank" class="info-link">View Profile ↗</a>
+                    </div>
+                    {% endif %}
+                    {% if profile.linkedin_url %}
+                    <div class="info-item">
+                        <div class="info-label">LinkedIn</div>
+                        <a href="{{ profile.linkedin_url }}" target="_blank" class="info-link">View Profile ↗</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RIGHT: Leaderboard + Referral -->
+        <div class="right-col">
+
+            <!-- FULL LEADERBOARD LIST -->
+            <div class="leaderboard">
+                <div class="lb-header">
+                    <div>
+                        <h2>📊 Leaderboard</h2>
+                        <div class="lb-subtitle">
+                            {{ profile.college_name }} ·
+                            {% if app.team == 'technical' %}Tech Team
+                            {% elif app.team == 'marketing' %}Marketing Team
+                            {% else %}Accommodation Partners{% endif %}
+                        </div>
+                    </div>
+                    <div class="lb-badge">Reward Points</div>
+                </div>
+                <div class="lb-list">
+                    {% if top_performers %}
+                        {% for performer in top_performers %}
+                        <div class="lb-item">
+                            <div class="lb-rank rank-{{ forloop.counter }}">
+                                {% if forloop.counter == 1 %}🥇
+                                {% elif forloop.counter == 2 %}🥈
+                                {% else %}🥉{% endif %}
+                            </div>
+                            {% if performer.profile_photo %}
+                                <img src="{{ performer.profile_photo.url }}" class="lb-photo" alt="{{ performer.user.profile.full_name }}">
+                            {% else %}
+                                <div class="lb-photo-ph">
+                                    {% if performer.team == 'technical' %}💻
+                                    {% elif performer.team == 'marketing' %}📣
+                                    {% else %}🏠{% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="lb-info">
+                                <div class="lb-name">{{ performer.user.profile.full_name }}</div>
+                                <div class="lb-meta">{{ performer.user.profile.branch }} · {{ performer.user.profile.get_year_display }}</div>
+                            </div>
+                            <div>
+                                <div class="lb-points">{{ performer.reward_points }}</div>
+                                <div class="lb-pts-label">pts</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="lb-empty">
+                            <div class="lb-empty-icon">🚀</div>
+                            <p>You could be the first!<br>
+                            No performers yet from your college.<br>
+                            <strong style="color:var(--tc);">Get to the top!</strong></p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- REFERRAL CARD -->
+            <div class="referral-card">
+                <h2>🔗 Share Your Referral Code</h2>
+                <p>Invite friends to join CampusCrew and earn reward points!</p>
+                <div class="share-row">
+                    <input class="share-input" value="{{ app.referral_code }}" readonly onclick="copyText('{{ app.referral_code }}', this)">
+                    <button class="btn btn-primary" onclick="copyText('{{ app.referral_code }}')">Copy</button>
+                </div>
+                <p style="margin-top: 0.8rem; font-size: 0.82rem; color: var(--text-muted);">
+                    Your unique Crew ID and referral code are the same: <code style="color:var(--tc); font-family:var(--mono);">{{ app.referral_code }}</code>
+                </p>
+            </div>
+
+            <!-- Application Skills -->
+            <div class="info-card">
+                <h2>🛠️ Your Skills</h2>
+                <div style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+                    {{ app.skills }}
+                </div>
+                {% if app.team == 'technical' and app.tech_stack %}
+                <div style="margin-top: 0.8rem;">
+                    <div class="info-label">Tech Stack</div>
+                    <div style="font-family: var(--mono); color: var(--tc); font-size: 0.88rem; margin-top: 0.3rem;">{{ app.tech_stack }}</div>
+                </div>
+                {% endif %}
+                {% if app.team == 'marketing' and app.social_media_handles %}
+                <div style="margin-top: 0.8rem;">
+                    <div class="info-label">Social Media</div>
+                    <div style="color: var(--tc); font-size: 0.88rem; margin-top: 0.3rem;">{{ app.social_media_handles }}</div>
+                </div>
+                {% endif %}
+                {% if app.team == 'accommodation' and app.city_area %}
+                <div style="margin-top: 0.8rem;">
+                    <div class="info-label">Area</div>
+                    <div style="color: var(--tc); font-size: 0.88rem; margin-top: 0.3rem;">{{ app.city_area }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast">Copied!</div>
+<script>
+function copyText(text, el) {
+    navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('toast');
+        toast.textContent = `"${text}" copied! ✓`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+}
+</script>
+{% endblock %}

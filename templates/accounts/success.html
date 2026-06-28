@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block title %}Application Submitted — CampusCrew{% endblock %}
+{% block extra_css %}
+<style>
+{% if app.team == 'technical' %}:root { --tc: #2563eb; --tg: rgba(37,99,235,0.10); }
+{% elif app.team == 'marketing' %}:root { --tc: #ea8c00; --tg: rgba(234,140,0,0.10); }
+{% else %}:root { --tc: #0d9488; --tg: rgba(13,148,136,0.10); }{% endif %}
+
+.page {
+    min-height: calc(100vh - 65px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1rem;
+    background: radial-gradient(ellipse at 50% 50%, var(--tg) 0%, transparent 70%);
+}
+.success-wrap { max-width: 560px; width: 100%; }
+.success-icon {
+    text-align: center; font-size: 4rem; margin-bottom: 1rem;
+    animation: pop 0.5s ease;
+}
+@keyframes pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+.success-text { text-align: center; margin-bottom: 2.5rem; }
+.success-text h1 { font-size: 2rem; font-weight: 700; }
+.success-text p { color: var(--text-muted); margin-top: 0.5rem; }
+
+/* CREW ID CARD */
+.crew-card {
+    background: var(--surface);
+    border: 1px solid var(--tc);
+    border-radius: 20px; padding: 0;
+    overflow: hidden; margin-bottom: 1.5rem;
+    box-shadow: 0 0 32px var(--tg), 0 4px 20px rgba(15,39,66,0.06);
+    position: relative;
+}
+.crew-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--tc), color-mix(in srgb, var(--tc) 60%, #fff));
+}
+.card-bg-pattern {
+    position: absolute; top: 0; right: 0; width: 200px; height: 100%;
+    background: radial-gradient(ellipse at 80% 50%, var(--tg) 0%, transparent 70%);
+    pointer-events: none;
+}
+.card-body { padding: 1.8rem 2rem; position: relative; z-index: 1; }
+.card-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+.card-org { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+.card-org span { color: var(--tc); font-weight: 700; }
+.card-team-badge {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--tc);
+    background: color-mix(in srgb, var(--tc) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tc) 28%, transparent);
+    border-radius: 100px; padding: 0.2rem 0.7rem;
+}
+.card-main { display: flex; gap: 1.5rem; align-items: flex-start; }
+.card-photo {
+    width: 80px; height: 80px; border-radius: 12px;
+    object-fit: cover; border: 2px solid var(--tc);
+    flex-shrink: 0;
+}
+.card-photo-placeholder {
+    width: 80px; height: 80px; border-radius: 12px;
+    background: color-mix(in srgb, var(--tc) 15%, transparent);
+    border: 2px solid var(--tc);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; flex-shrink: 0;
+}
+.card-info { flex: 1; }
+.card-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.2rem; }
+.card-college { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.2rem; }
+.card-branch { color: var(--text-muted); font-size: 0.82rem; }
+.card-ids { margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+.id-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+.id-item { flex: 1; min-width: 160px; }
+.id-label {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.3rem;
+}
+.id-value {
+    font-family: var(--mono); font-size: 1rem; font-weight: 700;
+    color: var(--tc); letter-spacing: 0.05em;
+    background: color-mix(in srgb, var(--tc) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tc) 22%, transparent);
+    padding: 0.4rem 0.8rem; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.id-value:hover { background: color-mix(in srgb, var(--tc) 18%, transparent); }
+.copy-icon { font-size: 0.75rem; opacity: 0.6; }
+
+.next-steps {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.2rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.next-steps h3 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.step { display: flex; gap: 10px; margin-bottom: 0.6rem; font-size: 0.9rem; color: var(--text-muted); }
+.step-num { color: var(--tc); font-weight: 700; font-family: var(--mono); }
+
+.btn-go { width: 100%; text-align: center; padding: 0.85rem; background: var(--tc); color: #fff;
+    border-radius: var(--radius); text-decoration: none; font-weight: 700;
+    display: block; transition: opacity 0.2s; }
+.btn-go:hover { opacity: 0.9; }
+
+.toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    background: var(--surface); border: 1px solid var(--tc);
+    color: var(--tc); padding: 0.7rem 1.5rem; border-radius: 100px;
+    font-size: 0.88rem; font-weight: 600;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    font-family: var(--mono);
+    box-shadow: 0 4px 16px rgba(15,39,66,0.1);
+}
+.toast.show { opacity: 1; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page">
+    <div class="success-wrap">
+        <div class="success-icon">🎉</div>
+        <div class="success-text">
+            <h1>Application Submitted!</h1>
+            <p>Your Crew ID is ready. You'll get approval after review — explore your dashboard in the meantime!</p>
+        </div>
+
+        <!-- CREW ID CARD -->
+        <div class="crew-card" id="crew-card">
+            <div class="card-bg-pattern"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="card-org">🎓 Campus<span>Crew</span></div>
+                    <div class="card-team-badge">
+                        {% if app.team == 'technical' %}💻 Tech Team
+                        {% elif app.team == 'marketing' %}📣 Marketing Team
+                        {% else %}🏠 Accommodation Partner{% endif %}
+                    </div>
+                </div>
+                <div class="card-main">
+                    {% if app.profile_photo %}
+                        <img src="{{ app.profile_photo.url }}" class="card-photo" alt="{{ app.user.profile.full_name }}">
+                    {% else %}
+                        <div class="card-photo-placeholder">👤</div>
+                    {% endif %}
+                    <div class="card-info">
+                        <div class="card-name">{{ app.user.profile.full_name }}</div>
+                        <div class="card-college">{{ app.user.profile.college_name }}</div>
+                        <div class="card-branch">{{ app.user.profile.branch }} · {{ app.user.profile.get_year_display }}</div>
+                    </div>
+                </div>
+                <div class="card-ids">
+                    <div class="id-row">
+                        <div class="id-item">
+                            <div class="id-label">Crew ID</div>
+                            <div class="id-value" onclick="copyText('{{ app.crew_id }}', this)">
+                                {{ app.crew_id }}
+                                <span class="copy-icon">📋</span>
+                            </div>
+                        </div>
+                        <div class="id-item">
+                            <div class="id-label">Referral Code</div>
+                            <div class="id-value" onclick="copyText('{{ app.referral_code }}', this)">
+                                {{ app.referral_code }}
+                                <span class="copy-icon">📋</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="next-steps">
+            <h3>⏭ Next Steps</h3>
+            <div class="step"><span class="step-num">01</span> Your application will be reviewed (1-3 days)</div>
+            <div class="step"><span class="step-num">02</span> You'll get a WhatsApp notification once approved</div>
+            <div class="step"><span class="step-num">03</span> Share your Referral Code with friends</div>
+            <div class="step"><span class="step-num">04</span> Collect reward points and climb the leaderboard!</div>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="btn-go">Go to Dashboard →</a>
+    </div>
+</div>
+<div class="toast" id="toast">Copied! ✓</div>
+<script>
+function copyText(text, el) {
+    navigator.clipboard.writeText(text).then(() => {
+        el.querySelector('.copy-icon').textContent = '✓';
+        const toast = document.getElementById('toast');
+        toast.textContent = `"${text}" copied!`;
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); el.querySelector('.copy-icon').textContent = '📋'; }, 2000);
+    });
+}
+</script>
+{% endblock %}
