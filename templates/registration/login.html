@@ -1,80 +1,429 @@
 {% extends 'base.html' %}
 {% block title %}Login — CampusCrew{% endblock %}
+{% block hero %}{% endblock %}
 {% block extra_css %}
 <style>
-.auth-wrap {
+.maxi-stage {
     min-height: calc(100vh - 65px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem;
-    background: radial-gradient(ellipse at 30% 50%, rgba(37,99,235,0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 20%, rgba(13,148,136,0.05) 0%, transparent 50%);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    padding: 3rem 1.5rem;
+    background: var(--navy);
+    overflow: hidden;
+    isolation: isolate;
 }
-.auth-card {
+
+/* layered decorative blobs + grid + noise texture */
+.maxi-stage::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+        radial-gradient(circle at 8% 12%, rgba(245,166,35,0.35) 0%, transparent 28%),
+        radial-gradient(circle at 92% 8%, rgba(29,78,216,0.45) 0%, transparent 32%),
+        radial-gradient(circle at 85% 88%, rgba(245,166,35,0.22) 0%, transparent 30%),
+        radial-gradient(circle at 5% 90%, rgba(13,148,136,0.30) 0%, transparent 30%),
+        linear-gradient(155deg, var(--navy) 0%, var(--navy2) 60%, #081a30 100%);
+    z-index: 0;
+}
+.maxi-stage::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+    background-size: 42px 42px;
+    z-index: 0;
+}
+.maxi-shape {
+    position: absolute; z-index: 0; pointer-events: none;
+}
+.maxi-shape.s1 {
+    top: 6%; left: 5%; width: 90px; height: 90px;
+    border: 3px solid rgba(245,166,35,0.5); border-radius: 50%;
+    animation: spinSlow 22s linear infinite;
+}
+.maxi-shape.s2 {
+    bottom: 10%; right: 7%; width: 130px; height: 130px;
+    border: 3px solid rgba(255,255,255,0.18); border-radius: 28px;
+    transform: rotate(18deg);
+}
+.maxi-shape.s3 {
+    top: 14%; right: 14%; font-size: 2.6rem; color: rgba(245,166,35,0.6);
+    animation: float 7s ease-in-out infinite;
+}
+.maxi-shape.s4 {
+    bottom: 8%; left: 10%; font-size: 2.2rem; color: rgba(255,255,255,0.25);
+    animation: float 9s ease-in-out infinite reverse;
+}
+.maxi-shape.s5 {
+    top: 45%; left: 3%; width: 5px; height: 90px;
+    background: linear-gradient(180deg, var(--gold), transparent);
+    transform: rotate(20deg);
+}
+.maxi-shape.s6 {
+    top: 38%; right: 3%; width: 5px; height: 110px;
+    background: linear-gradient(180deg, var(--tech-glow), transparent);
+    transform: rotate(-15deg);
+}
+@keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+
+/* 3D cityscape watermark layers — parallax depth */
+.city-layer {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 0;
+    pointer-events: none;
+}
+.city-layer svg { width: 100%; display: block; }
+.city-far {
+    height: 38%; opacity: 0.16; filter: blur(0.5px);
+    transform: perspective(800px) rotateX(2deg) scale(1.04);
+    transform-origin: bottom;
+}
+.city-mid {
+    height: 28%; opacity: 0.26;
+    transform: perspective(800px) rotateX(3deg) scale(1.02);
+    transform-origin: bottom;
+}
+.city-near {
+    height: 20%; opacity: 0.4;
+    transform: perspective(800px) rotateX(4deg);
+    transform-origin: bottom;
+}
+.city-watermark-tag {
+    position: absolute; top: 50%; z-index: 1; pointer-events: none; white-space: nowrap;
+    font-family: var(--head); font-weight: 800;
+    font-size: clamp(2.4rem, 8vw, 5.5rem);
+    letter-spacing: 0.01em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(13,148,136,0.55);
+    background: linear-gradient(180deg, rgba(13,148,136,0.42) 0%, rgba(13,148,136,0.08) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    text-shadow: 0 12px 30px rgba(13,148,136,0.35);
+}
+.city-watermark-tag.wm-left {
+    left: 8%; transform: translateY(-50%) perspective(600px) rotateY(22deg);
+    transform-origin: left center;
+    animation: floatWatermarkL 8s ease-in-out infinite;
+}
+.city-watermark-tag.wm-right {
+    right: 8%; transform: translateY(-50%) perspective(600px) rotateY(-22deg);
+    transform-origin: right center;
+    animation: floatWatermarkR 8s ease-in-out infinite;
+}
+@keyframes floatWatermarkL {
+    0%,100% { transform: translateY(-50%) perspective(600px) rotateY(22deg) translateX(0); }
+    50% { transform: translateY(-50%) perspective(600px) rotateY(18deg) translateX(-8px); }
+}
+@keyframes floatWatermarkR {
+    0%,100% { transform: translateY(-50%) perspective(600px) rotateY(-22deg) translateX(0); }
+    50% { transform: translateY(-50%) perspective(600px) rotateY(-18deg) translateX(8px); }
+}
+@media(max-width: 700px) {
+    .city-watermark-tag { display: none; }
+}
+
+/* extra animated 3D background elements */
+.maxi-3d {
+    position: absolute; z-index: 0; pointer-events: none;
+    transform-style: preserve-3d;
+}
+.maxi-3d.cube1 {
+    top: 12%; left: 8%; width: 70px; height: 70px;
+    border: 3px solid rgba(13,148,136,0.45);
+    background: rgba(13,148,136,0.06);
+    animation: cubeSpin 14s linear infinite;
+}
+.maxi-3d.cube2 {
+    bottom: 16%; right: 10%; width: 90px; height: 90px;
+    border: 3px solid rgba(245,166,35,0.4);
+    background: rgba(245,166,35,0.05);
+    animation: cubeSpin 18s linear infinite reverse;
+}
+.maxi-3d.cube3 {
+    top: 55%; right: 4%; width: 50px; height: 50px;
+    border: 3px solid rgba(29,78,216,0.45);
+    background: rgba(29,78,216,0.06);
+    animation: cubeSpin 11s linear infinite;
+}
+@keyframes cubeSpin {
+    0% { transform: perspective(400px) rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    100% { transform: perspective(400px) rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+}
+.maxi-3d.ring1 {
+    bottom: 6%; left: 22%; width: 120px; height: 40px;
+    border: 3px solid rgba(13,148,136,0.3); border-radius: 50%;
+    animation: ringTilt 10s ease-in-out infinite;
+}
+@keyframes ringTilt {
+    0%,100% { transform: perspective(500px) rotateX(60deg) rotateZ(0deg); }
+    50% { transform: perspective(500px) rotateX(75deg) rotateZ(180deg); }
+}
+
+.maxi-headline {
+    position: absolute; top: 4%; left: 50%; transform: translateX(-50%);
+    z-index: 1; text-align: center; width: 100%; padding: 0 1rem;
+    pointer-events: none;
+}
+.maxi-headline .stamp {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.08); border: 1.5px solid rgba(245,166,35,0.4);
+    color: var(--gold); border-radius: 100px; padding: 0.4rem 1.1rem;
+    font-size: 0.78rem; font-family: var(--mono); font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+.maxi-card {
+    position: relative; z-index: 2;
+    width: 100%; max-width: 480px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 2.5rem;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 4px 24px rgba(15,39,66,0.05);
+    border-radius: 28px;
+    padding: 3rem 2.6rem 2.6rem;
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 30px 70px -20px rgba(0,0,0,0.55),
+        0 0 80px -10px rgba(245,166,35,0.18);
+    overflow: hidden;
 }
-.auth-header { text-align: center; margin-bottom: 2rem; }
-.auth-header h1 { font-size: 1.8rem; font-weight: 700; }
-.auth-header p { color: var(--text-muted); margin-top: 0.4rem; font-size: 0.95rem; }
-.field { margin-bottom: 1.2rem; }
-.field label {
-    display: block; font-size: 0.82rem; font-weight: 600;
-    color: var(--text-muted); margin-bottom: 0.4rem;
-    text-transform: uppercase; letter-spacing: 0.05em;
+.maxi-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 7px;
+    background: linear-gradient(90deg, var(--gold), var(--tech), var(--gold), #0d9488, var(--gold));
+    background-size: 300% 100%;
+    animation: shimmer 5s linear infinite;
 }
-.field input, .field select, .field textarea {
-    width: 100%; background: var(--surface2);
-    border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 0.75rem 1rem; color: var(--text);
-    font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem;
-    transition: border-color 0.2s;
+@keyframes shimmer { 0% { background-position: 0% 0; } 100% { background-position: 300% 0; } }
+.maxi-card::after {
+    content: '🎓';
+    position: absolute; top: -28px; right: -28px;
+    width: 100px; height: 100px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), #f59e0b);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem; transform: rotate(18deg);
+    box-shadow: 0 10px 24px -6px rgba(245,158,11,0.5);
 }
-.field input:focus, .field select:focus, .field textarea:focus {
-    outline: none; border-color: var(--tech);
-    box-shadow: 0 0 0 3px var(--tech-glow);
-}
-.auth-footer { text-align: center; margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem; }
-.auth-footer a { color: var(--tech); text-decoration: none; }
-.btn-full { width: 100%; justify-content: center; padding: 0.85rem; font-size: 1rem; }
-.brand-badge {
+
+.maxi-eyebrow {
     display: inline-flex; align-items: center; gap: 6px;
-    background: var(--tech-glow); border: 1px solid rgba(37,99,235,0.25);
-    border-radius: 100px; padding: 0.3rem 0.8rem;
-    font-size: 0.8rem; color: var(--tech); margin-bottom: 1rem;
-    font-family: var(--mono);
+    background: var(--tech-glow); border: 1px solid rgba(29,78,216,0.3);
+    border-radius: 100px; padding: 0.32rem 0.95rem;
+    font-size: 0.74rem; color: var(--tech); margin-bottom: 1.1rem;
+    font-family: var(--mono); font-weight: 700; letter-spacing: 0.04em;
+}
+.maxi-title {
+    font-size: 2.4rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em;
+}
+.maxi-title em {
+    font-style: normal; color: var(--tech);
+    background: linear-gradient(90deg, var(--tech), #0d9488);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.maxi-sub {
+    color: var(--text-muted); margin-top: 0.6rem; font-size: 1rem; line-height: 1.55;
+}
+
+.maxi-divider {
+    height: 3px; width: 56px; margin: 1.6rem 0 1.7rem;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    border-radius: 4px;
+}
+
+.field { margin-bottom: 1.3rem; position: relative; }
+.field label {
+    display: block; font-size: 0.74rem; font-weight: 800;
+    color: var(--navy); margin-bottom: 0.5rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+}
+.field-icon {
+    position: absolute; left: 1.05rem; top: calc(50% + 0.7rem);
+    transform: translateY(-50%); font-size: 1.05rem; pointer-events: none;
+}
+.field input {
+    width: 100%; background: var(--surface2);
+    border: 2px solid var(--border); border-radius: 14px;
+    padding: 0.95rem 1rem 0.95rem 2.9rem; color: var(--text);
+    font-family: var(--sans); font-size: 1rem; font-weight: 500;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.field input::placeholder { color: var(--text-muted); opacity: 0.55; }
+.field input:focus {
+    outline: none; border-color: var(--tech); background: var(--surface);
+    box-shadow: 0 0 0 5px var(--tech-glow); transform: translateY(-1px);
+}
+.field-toggle {
+    position: absolute; right: 1rem; top: calc(50% + 0.7rem);
+    transform: translateY(-50%); background: none; border: none;
+    color: var(--tech); cursor: pointer; font-size: 0.82rem;
+    font-family: var(--sans); font-weight: 800; padding: 0;
+    text-transform: uppercase; letter-spacing: 0.04em;
+}
+.field-toggle:hover { color: var(--navy); }
+
+.btn-maxi {
+    width: 100%; justify-content: center; padding: 1.05rem; font-size: 1.05rem;
+    border-radius: 14px; font-weight: 800; letter-spacing: 0.01em;
+    background: linear-gradient(120deg, var(--navy), var(--navy2));
+    color: #fff; box-shadow: 0 14px 28px -8px rgba(11,37,69,0.5);
+    transition: all 0.2s; position: relative; overflow: hidden;
+    border: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+}
+.btn-maxi:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 20px 36px -8px rgba(11,37,69,0.6); }
+.btn-maxi:active { transform: translateY(0) scale(0.99); }
+
+.maxi-stats {
+    display: flex; justify-content: space-between; gap: 0.7rem;
+    margin-top: 1.8rem; padding-top: 1.5rem; border-top: 2px dashed var(--border);
+}
+.maxi-stat { text-align: center; flex: 1; }
+.maxi-stat-val { font-family: var(--mono); font-weight: 800; font-size: 1.2rem; color: var(--tech); }
+.maxi-stat-lbl { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.2rem; font-weight: 700; }
+
+.maxi-footer {
+    text-align: center; margin-top: 1.7rem; font-size: 0.95rem; color: var(--text-muted);
+}
+.maxi-footer a {
+    color: var(--navy); text-decoration: none; font-weight: 800;
+    border-bottom: 2px solid var(--gold);
+}
+.maxi-footer a:hover { color: var(--tech); }
+
+@media(max-width: 480px) {
+    .maxi-card { padding: 2.4rem 1.6rem 2rem; border-radius: 22px; }
+    .maxi-title { font-size: 1.9rem; }
+    .maxi-card::after { width: 76px; height: 76px; font-size: 1.7rem; top: -20px; right: -20px; }
+    .maxi-stats { flex-wrap: wrap; }
 }
 </style>
 {% endblock %}
 {% block content %}
-<div class="auth-wrap">
-    <div class="auth-card">
-        <div class="auth-header">
-            <div class="brand-badge">🎓 campuscrew.in</div>
-            <h1>Welcome back</h1>
-            <p>Log in to see your crew dashboard</p>
-        </div>
+<div class="maxi-stage">
+    <!-- 3D layered cityscape watermark (UrbanTenants brand) -->
+    <div class="city-layer city-far">
+        <svg viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="60" width="70" height="140" fill="#fff"/>
+            <rect x="110" y="30" width="55" height="170" fill="#fff"/>
+            <rect x="185" y="80" width="60" height="120" fill="#fff"/>
+            <rect x="270" y="10" width="50" height="190" fill="#fff"/>
+            <rect x="340" y="55" width="65" height="145" fill="#fff"/>
+            <rect x="430" y="40" width="55" height="160" fill="#fff"/>
+            <rect x="500" y="75" width="70" height="125" fill="#fff"/>
+            <rect x="590" y="20" width="50" height="180" fill="#fff"/>
+            <rect x="660" y="60" width="60" height="140" fill="#fff"/>
+            <rect x="740" y="35" width="55" height="165" fill="#fff"/>
+            <rect x="815" y="70" width="65" height="130" fill="#fff"/>
+            <rect x="900" y="15" width="50" height="185" fill="#fff"/>
+            <rect x="970" y="55" width="60" height="145" fill="#fff"/>
+            <rect x="1050" y="40" width="55" height="160" fill="#fff"/>
+            <rect x="1125" y="75" width="55" height="125" fill="#fff"/>
+        </svg>
+    </div>
+    <div class="city-layer city-mid">
+        <svg viewBox="0 0 1200 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="60" width="80" height="100" fill="#fff"/>
+            <rect x="95" y="20" width="60" height="140" fill="#fff"/>
+            <rect x="170" y="55" width="70" height="105" fill="#fff"/>
+            <rect x="260" y="0" width="55" height="160" fill="#fff"/>
+            <rect x="330" y="45" width="75" height="115" fill="#fff"/>
+            <rect x="420" y="25" width="60" height="135" fill="#fff"/>
+            <rect x="495" y="65" width="80" height="95" fill="#fff"/>
+            <rect x="590" y="10" width="55" height="150" fill="#fff"/>
+            <rect x="660" y="50" width="70" height="110" fill="#fff"/>
+            <rect x="745" y="30" width="60" height="130" fill="#fff"/>
+            <rect x="820" y="60" width="75" height="100" fill="#fff"/>
+            <rect x="910" y="5" width="55" height="155" fill="#fff"/>
+            <rect x="980" y="45" width="65" height="115" fill="#fff"/>
+            <rect x="1060" y="25" width="60" height="135" fill="#fff"/>
+            <rect x="1135" y="60" width="60" height="100" fill="#fff"/>
+        </svg>
+    </div>
+    <div class="city-layer city-near">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="-10" y="40" width="90" height="80" fill="#fff"/>
+            <rect x="90" y="10" width="65" height="110" fill="#fff"/>
+            <rect x="170" y="45" width="80" height="75" fill="#fff"/>
+            <rect x="270" y="0" width="60" height="120" fill="#fff"/>
+            <rect x="350" y="35" width="85" height="85" fill="#fff"/>
+            <rect x="450" y="15" width="65" height="105" fill="#fff"/>
+            <rect x="530" y="50" width="90" height="70" fill="#fff"/>
+            <rect x="635" y="5" width="60" height="115" fill="#fff"/>
+            <rect x="710" y="40" width="75" height="80" fill="#fff"/>
+            <rect x="800" y="20" width="65" height="100" fill="#fff"/>
+            <rect x="880" y="50" width="85" height="70" fill="#fff"/>
+            <rect x="980" y="0" width="60" height="120" fill="#fff"/>
+            <rect x="1055" y="38" width="75" height="82" fill="#fff"/>
+            <rect x="1145" y="20" width="65" height="100" fill="#fff"/>
+        </svg>
+    </div>
+    <div class="city-watermark-tag wm-left">Urban</div>
+    <div class="city-watermark-tag wm-right">Tenants</div>
+
+    <div class="maxi-3d cube1"></div>
+    <div class="maxi-3d cube2"></div>
+    <div class="maxi-3d cube3"></div>
+    <div class="maxi-3d ring1"></div>
+
+    <div class="maxi-shape s1"></div>
+    <div class="maxi-shape s2"></div>
+    <div class="maxi-shape s3">✦</div>
+    <div class="maxi-shape s4">◆</div>
+    <div class="maxi-shape s5"></div>
+    <div class="maxi-shape s6"></div>
+
+    <div class="maxi-headline">
+    </div>
+
+    <div class="maxi-card">
+        <span class="maxi-eyebrow">🔑 Member Access</span>
+        <h1 class="maxi-title">Welcome back,<br><em>leader.</em></h1>
+        <p class="maxi-sub">Log in to check your rank, track your points, and keep climbing.</p>
+        <div class="maxi-divider"></div>
+
         <form method="post">
             {% csrf_token %}
             <div class="field">
+                <span class="field-icon">👤</span>
                 <label>Username</label>
-                <input type="text" name="username" placeholder="your_username" autofocus>
+                <input type="text" name="username" placeholder="your_username" autofocus autocomplete="username">
             </div>
             <div class="field">
+                <span class="field-icon">🔒</span>
                 <label>Password</label>
-                <input type="password" name="password" placeholder="••••••••">
+                <input type="password" name="password" placeholder="••••••••" id="password-input" autocomplete="current-password">
+                <button type="button" class="field-toggle" onclick="togglePassword()">Show</button>
             </div>
-            <button type="submit" class="btn btn-primary btn-full">Login →</button>
+            <button type="submit" class="btn btn-maxi">Login →</button>
         </form>
-        <div class="auth-footer">
+
+        <div class="maxi-stats">
+            <div class="maxi-stat">
+                <div class="maxi-stat-val">3</div>
+                <div class="maxi-stat-lbl">Teams</div>
+            </div>
+            <div class="maxi-stat">
+                <div class="maxi-stat-val">∞</div>
+                <div class="maxi-stat-lbl">Growth</div>
+            </div>
+            <div class="maxi-stat">
+                <div class="maxi-stat-val">#1</div>
+                <div class="maxi-stat-lbl">Could Be You</div>
+            </div>
+        </div>
+
+        <div class="maxi-footer">
             New here? <a href="{% url 'register' %}">Create an account</a>
         </div>
     </div>
 </div>
+<script>
+function togglePassword() {
+    const input = document.getElementById('password-input');
+    const btn = document.querySelector('.field-toggle');
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'Hide';
+    } else {
+        input.type = 'password';
+        btn.textContent = 'Show';
+    }
+}
+</script>
 {% endblock %}

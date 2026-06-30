@@ -2,208 +2,339 @@
 {% block title %}Dashboard — CampusCrew{% endblock %}
 {% block extra_css %}
 <style>
-{% if app.team == 'technical' %}:root { --tc: #2563eb; --tc2: #1d4ed8; --tg: rgba(37,99,235,0.10); }
-{% elif app.team == 'marketing' %}:root { --tc: #ea8c00; --tc2: #c2710a; --tg: rgba(234,140,0,0.10); }
-{% else %}:root { --tc: #0d9488; --tc2: #0b7a70; --tg: rgba(13,148,136,0.10); }{% endif %}
+{% if app.team == 'technical' %}:root { --tc: #2563eb; --tc2: #1d4ed8; --tg: rgba(37,99,235,0.14); }
+{% elif app.team == 'marketing' %}:root { --tc: #ea8c00; --tc2: #c2710a; --tg: rgba(234,140,0,0.14); }
+{% else %}:root { --tc: #0d9488; --tc2: #0b7a70; --tg: rgba(13,148,136,0.14); }{% endif %}
 
-.page { padding: 2.5rem 1.5rem 4rem; max-width: 1140px; margin: 0 auto; }
+* { box-sizing: border-box; }
 
-.dash-header { margin-bottom: 2.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-.dash-header .welcome {
-    color: var(--text-muted); font-size: 0.78rem; margin-bottom: 0.35rem;
-    text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700;
+/* ══════════════════════════════════════════════
+   MAXIMALIST PAGE — multi-layer pattern soup
+══════════════════════════════════════════════ */
+.page {
+    margin: 0 auto; max-width: 1200px; padding: 0 0 4rem; position: relative;
+    background:
+        repeating-linear-gradient(45deg, var(--blue-pale) 0 2px, transparent 2px 26px),
+        repeating-linear-gradient(-45deg, var(--amber-pale) 0 2px, transparent 2px 30px),
+        radial-gradient(circle at 10% 8%, var(--tg) 0%, transparent 24%),
+        radial-gradient(circle at 92% 14%, var(--amber-pale) 0%, transparent 26%),
+        radial-gradient(circle at 50% 96%, var(--green-pale) 0%, transparent 32%),
+        var(--bg);
 }
-.dash-header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.01em; }
-.dash-header h1 span { color: var(--tc); }
-.dash-date { font-family: var(--mono); font-size: 0.78rem; color: var(--text-muted);
-    background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
-    padding: 0.45rem 1rem; }
+.confetti-icon {
+    position: absolute; z-index: 0; pointer-events: none; line-height: 1;
+    filter: drop-shadow(0 4px 10px rgba(11,37,69,0.08));
+}
+.ci-1 { top: 60px;  right: -40px; font-size: 10rem; opacity: 0.08; transform: rotate(12deg); }
+.ci-2 { top: 480px; left: -30px;  font-size: 7rem;  opacity: 0.07; transform: rotate(-16deg); }
+.ci-3 { bottom: 60px; right: 4%; font-size: 6rem;   opacity: 0.08; transform: rotate(8deg); }
+.ci-4 { top: 220px; left: 38%;  font-size: 3.4rem;  opacity: 0.10; transform: rotate(-6deg); }
+.ci-5 { bottom: 460px; left: 6%; font-size: 4rem;   opacity: 0.08; transform: rotate(18deg); }
+.dot-field {
+    position: absolute; top: 0; left: 0; right: 0; height: 360px; z-index: 0; pointer-events: none;
+    background-image: radial-gradient(circle, rgba(11,37,69,0.07) 1.6px, transparent 1.6px);
+    background-size: 20px 20px;
+}
 
-/* HERO: TOP PERFORMERS */
+/* ══════════════════════════════════════════════
+   MASTHEAD — loud, layered, multi-texture banner
+══════════════════════════════════════════════ */
+.ut-masthead {
+    position: relative; z-index: 1; overflow: hidden;
+    background:
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.05) 0 3px, transparent 3px 16px),
+        radial-gradient(circle at 90% 10%, rgba(251,191,36,0.25) 0%, transparent 40%),
+        radial-gradient(circle at 8% 90%, rgba(13,148,136,0.22) 0%, transparent 38%),
+        linear-gradient(115deg, var(--navy) 0%, #173b66 28%, var(--tc2) 62%, var(--navy2) 100%);
+    padding: 1.5rem 1.8rem;
+    border-bottom: 6px solid var(--gold);
+}
+.ut-masthead::before {
+    content: ''; position: absolute; inset: 0; z-index: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.10) 1px, transparent 1px);
+    background-size: 15px 15px;
+}
+.ut-masthead::after {
+    content: '🏕️'; position: absolute; top: -34px; right: 2%; font-size: 10rem;
+    opacity: 0.12; transform: rotate(-12deg); pointer-events: none; z-index: 0;
+}
+.ut-masthead-tent2 {
+    position: absolute; bottom: -20px; left: 8%; font-size: 4.5rem; opacity: 0.1;
+    transform: rotate(15deg); pointer-events: none; z-index: 0;
+}
+.ut-masthead-row {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.ut-masthead-brand { display: flex; align-items: center; gap: 1rem; }
+.ut-tent-badge {
+    width: 58px; height: 58px; border-radius: 16px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--gold), #fde68a, var(--gold));
+    border: 3px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.9rem; box-shadow: 0 8px 22px rgba(245,158,11,0.55), inset 0 0 0 2px rgba(255,255,255,0.5);
+    transform: rotate(-4deg);
+}
+.ut-masthead-title {
+    color: #fff; font-weight: 800; font-size: 1.45rem; letter-spacing: -0.01em; line-height: 1.1;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+.ut-masthead-title .ut-accent { color: var(--gold); }
+.ut-masthead-sub {
+    color: rgba(255,255,255,0.7); font-size: 0.76rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.14em; margin-top: 0.3rem;
+}
+.ut-masthead-pills { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.ut-pill {
+    font-family: var(--mono); font-size: 0.74rem; font-weight: 700; color: #fff;
+    background: rgba(255,255,255,0.16); border: 1.5px solid rgba(255,255,255,0.34);
+    backdrop-filter: blur(6px); border-radius: 100px; padding: 0.42rem 1rem;
+    white-space: nowrap; display: flex; align-items: center; gap: 0.4rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+.ut-pill.gold { background: linear-gradient(135deg, var(--gold), #fbbf24); color: #78350f; border-color: #fde68a; font-weight: 800; }
+.ut-pill.green-dot::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399; display: inline-block; animation: pulseDot 1.6s ease-in-out infinite; }
+@keyframes pulseDot { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.7);opacity:0.6;} }
+
+.ut-ribbon {
+    height: 14px; position: relative; z-index: 1;
+    background: repeating-linear-gradient(-45deg,
+        var(--gold) 0 16px, var(--blue) 16px 32px, var(--green) 32px 48px, var(--amber) 48px 64px);
+    box-shadow: inset 0 3px 6px rgba(0,0,0,0.18);
+}
+
+.page-content { padding: 2.4rem 1.5rem 0; position: relative; z-index: 1; }
+
+/* ── HEADER — bold framed badge style ── */
+.dash-header {
+    margin-bottom: 2.2rem; display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    background: var(--surface); border: 3px solid var(--tc); border-radius: 22px;
+    padding: 1.3rem 1.6rem; position: relative; overflow: hidden;
+    box-shadow: 6px 6px 0 var(--tg), 0 10px 30px -10px rgba(11,37,69,0.12);
+}
+.dash-header::after { content: '⛺'; position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.06; transform: rotate(-10deg); }
+.dash-header .welcome {
+    color: var(--tc); font-size: 0.78rem; margin-bottom: 0.35rem;
+    text-transform: uppercase; letter-spacing: 0.14em; font-weight: 800;
+}
+.dash-header h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 800; letter-spacing: -0.01em; position: relative; z-index: 1; }
+.dash-header h1 span { color: var(--tc); }
+.dash-streak {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; position: relative; z-index: 1;
+}
+.streak-chip {
+    font-family: var(--mono); font-weight: 800; font-size: 0.85rem;
+    background: var(--tc); color: #fff; border-radius: 12px;
+    padding: 0.55rem 1rem; text-align: center; min-width: 70px;
+    box-shadow: 3px 3px 0 var(--tg);
+}
+.streak-chip small { display: block; font-family: var(--sans); font-weight: 600; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.85; margin-top: 0.15rem; }
+.streak-chip.gold { background: linear-gradient(135deg, var(--gold), #fbbf24); color: #78350f; }
+.streak-chip.green { background: linear-gradient(135deg, var(--green), #10b981); }
+
+/* ══════ TOP PERFORMERS — maximalist trophy zone ══════ */
 .hero-performers {
     background: var(--surface);
-    border: 1px solid var(--border); border-radius: 28px;
-    padding: 2.2rem; margin-bottom: 2rem; position: relative; overflow: hidden;
-    box-shadow: 0 1px 2px rgba(15,39,66,0.04), 0 16px 40px -12px rgba(15,39,66,0.08);
+    border: 3px solid var(--gold); border-radius: 30px;
+    padding: 2.3rem; margin-bottom: 2.2rem; position: relative; overflow: hidden;
+    box-shadow: 8px 8px 0 var(--amber-pale), 0 20px 44px -14px rgba(245,158,11,0.18);
 }
 .hero-performers::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(90deg, var(--tc), var(--gold), var(--tc));
-    background-size: 200% 100%;
-    animation: shimmer 6s linear infinite;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 8px;
+    background: repeating-linear-gradient(90deg, var(--tc) 0 20px, var(--gold) 20px 40px, var(--green) 40px 60px);
+    background-size: 240% 100%; animation: shimmer 7s linear infinite;
 }
-@keyframes shimmer { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+@keyframes shimmer { 0% { background-position: 0% 0; } 100% { background-position: 240% 0; } }
 .hero-performers::after {
-    content: ''; position: absolute; top: -60%; right: -10%;
-    width: 360px; height: 360px; border-radius: 50%;
-    background: radial-gradient(circle, var(--tg) 0%, transparent 70%);
-    pointer-events: none;
+    content: '🏆'; position: absolute; top: -10%; right: -4%;
+    font-size: 13rem; opacity: 0.06; pointer-events: none; transform: rotate(14deg);
 }
-.hero-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 0.5rem; position: relative; z-index: 1; }
-.hero-head h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.01em; }
-.hero-head .hero-subtitle { color: var(--text-muted); font-size: 0.86rem; margin-top: 0.3rem; }
-.hero-badge { font-family: var(--mono); font-size: 0.72rem; font-weight: 600; color: var(--tc);
-    background: var(--tg); border: 1px solid color-mix(in srgb, var(--tc) 30%, transparent);
-    border-radius: 100px; padding: 0.35rem 0.9rem; white-space: nowrap; }
-.hero-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; position: relative; z-index: 1; }
-@media(max-width: 700px) { .hero-grid { grid-template-columns: 1fr; } }
+.hero-stars { position: absolute; top: 18%; left: 2%; font-size: 2.2rem; opacity: 0.12; transform: rotate(-15deg); pointer-events: none; }
+.hero-corner-tag {
+    position: absolute; top: 1.5rem; left: -0.5rem; z-index: 2;
+    background: linear-gradient(135deg, var(--gold), #fbbf24); color: #78350f; font-weight: 800; font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.09em; padding: 0.34rem 1.1rem 0.34rem 1.4rem;
+    border-radius: 0 8px 8px 0; box-shadow: 3px 4px 10px rgba(0,0,0,0.22);
+}
+.hero-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 0.6rem; position: relative; z-index: 1; padding-left: 2.4rem; }
+.hero-head h2 { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 800; letter-spacing: -0.01em; }
+.hero-head .hero-subtitle { color: var(--text-muted); font-size: 0.88rem; margin-top: 0.3rem; font-weight: 600; }
+.hero-badge {
+    font-family: var(--mono); font-size: 0.74rem; font-weight: 700; color: #fff;
+    background: var(--tc); border: none;
+    border-radius: 100px; padding: 0.4rem 1rem; white-space: nowrap;
+    box-shadow: 3px 3px 0 var(--tg);
+}
+.hero-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; position: relative; z-index: 1; }
 .hero-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 22px;
+    background: var(--surface); border: 3px solid var(--border); border-radius: 24px;
     padding: 0; text-align: center; position: relative;
     transition: transform 0.25s cubic-bezier(.2,.8,.2,1), box-shadow 0.25s; overflow: hidden;
+    box-shadow: 5px 5px 0 var(--surface2);
 }
-.hero-card:hover { transform: translateY(-8px); box-shadow: 0 18px 36px -10px rgba(15,39,66,0.18); }
+.hero-card:hover { transform: translateY(-10px) rotate(-1deg); box-shadow: 8px 12px 0 var(--surface2), 0 20px 40px -10px rgba(15,39,66,0.2); }
 .hero-card.rank-1 {
-    border-color: var(--gold); box-shadow: 0 12px 36px -8px rgba(245,158,11,0.32); order: 2;
+    border-color: var(--gold); box-shadow: 6px 6px 0 var(--amber-pale), 0 16px 40px -8px rgba(245,158,11,0.4); order: 2;
 }
+.hero-card.rank-1:hover { transform: scale(1.06) translateY(-10px) rotate(1deg); }
 .hero-card.rank-2 { order: 1; }
 .hero-card.rank-3 { order: 3; }
 @media(min-width: 701px) {
     .hero-grid { align-items: end; }
     .hero-card.rank-1 { transform: scale(1.06); }
-    .hero-card.rank-1:hover { transform: scale(1.06) translateY(-8px); }
 }
 .hero-photo-wrap { position: relative; width: 100%; aspect-ratio: 4 / 5; background: linear-gradient(155deg, var(--navy) 0%, var(--navy2) 100%); }
-.hero-photo {
-    width: 100%; height: 100%; object-fit: cover; display: block;
+.hero-photo-wrap::before {
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 14px 14px;
 }
+.hero-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hero-photo-ph {
     width: 100%; height: 100%; background: rgba(255,255,255,0.06);
     display: flex; align-items: center; justify-content: center; font-size: 3.4rem;
     color: rgba(255,255,255,0.3);
 }
 .hero-rank-tag {
-    position: absolute; top: 12px; left: 12px; z-index: 2;
-    width: 40px; height: 40px; border-radius: 50%;
+    position: absolute; top: 12px; left: 12px; z-index: 3;
+    width: 42px; height: 42px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 1.1rem; font-family: var(--mono);
-    border: 2px solid rgba(255,255,255,0.6); box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    font-weight: 700; font-size: 1.15rem; font-family: var(--mono);
+    border: 3px solid rgba(255,255,255,0.7); box-shadow: 0 4px 12px rgba(0,0,0,0.35);
 }
 .hero-rank-tag.r1 { background: linear-gradient(135deg, #fde68a, #f59e0b); color: #78350f; }
 .hero-rank-tag.r2 { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: #fff; }
 .hero-rank-tag.r3 { background: linear-gradient(135deg, #d6a567, #92400e); color: #fde68a; }
 .hero-points-tag {
-    position: absolute; top: 12px; right: 12px; z-index: 2;
-    font-family: var(--mono); font-weight: 800; font-size: 0.95rem; color: #fff;
-    background: rgba(0,0,0,0.42); backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 100px; padding: 0.35rem 0.85rem;
+    position: absolute; top: 12px; right: 12px; z-index: 3;
+    font-family: var(--mono); font-weight: 800; font-size: 0.98rem; color: #78350f;
+    background: var(--gold); border: 2px solid #fff;
+    border-radius: 100px; padding: 0.38rem 0.9rem; box-shadow: 0 3px 8px rgba(0,0,0,0.25);
 }
 .hero-photo-overlay {
-    position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
-    padding: 2.4rem 1.1rem 1.1rem;
-    background: linear-gradient(180deg, transparent 0%, rgba(8,20,38,0.88) 70%, rgba(8,20,38,0.97) 100%);
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+    padding: 2.6rem 1.2rem 1.2rem;
+    background: linear-gradient(180deg, transparent 0%, rgba(8,20,38,0.9) 65%, rgba(8,20,38,0.98) 100%);
     color: #fff; text-align: left;
 }
-.hero-name { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.15rem; color: #fff; }
-.hero-meta { font-size: 0.8rem; color: rgba(255,255,255,0.65); }
+.hero-name { font-size: 1.12rem; font-weight: 800; margin-bottom: 0.15rem; color: #fff; }
+.hero-meta { font-size: 0.8rem; color: rgba(255,255,255,0.7); font-weight: 600; }
 .hero-empty { text-align: center; padding: 3rem 1rem; color: var(--text-muted); position: relative; z-index: 1; }
-.hero-empty .hero-empty-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+.hero-empty .hero-empty-icon { font-size: 3.2rem; margin-bottom: 0.8rem; }
 .hero-empty p { font-size: 0.95rem; line-height: 1.6; }
 
-.dash-grid { display: grid; grid-template-columns: minmax(320px, 600px) 1fr; gap: 1.6rem; align-items: start; }
-@media(max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+.dash-grid { display: grid; grid-template-columns: minmax(320px, 600px) 1fr; gap: 1.7rem; align-items: start; position: relative; z-index: 1; }
 
-/* CREW ID CARD — big photo hero block */
+/* ══ CREW ID CARD ══ */
 .crew-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
+    background: var(--surface); border: 3px solid var(--navy); border-radius: 26px;
     overflow: hidden; position: relative;
-    box-shadow: 0 1px 2px rgba(15,39,66,0.04), 0 16px 40px -12px rgba(15,39,66,0.10);
+    box-shadow: 7px 7px 0 var(--tg), 0 20px 44px -14px rgba(15,39,66,0.16);
 }
 .crew-photo-block {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    aspect-ratio: 1 / 1;
-    margin: 0 auto;
-    overflow: hidden;
+    position: relative; width: 100%; max-width: 600px; aspect-ratio: 1 / 1;
+    margin: 0 auto; overflow: hidden;
     background: linear-gradient(155deg, var(--navy) 0%, var(--navy2) 100%);
 }
-.crew-photo-block img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
+.crew-photo-block::before {
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 18px 18px;
 }
+.crew-photo-block::after {
+    content: '🏕️'; position: absolute; bottom: -10px; left: -10px; font-size: 5rem;
+    opacity: 0.15; transform: rotate(-8deg); z-index: 1; pointer-events: none;
+}
+.crew-photo-block img { width: 100%; height: 100%; object-fit: cover; display: block; position: relative; z-index: 0; }
 .crew-photo-block .photo-ph-big {
     width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
     font-size: 5rem; color: rgba(255,255,255,0.3);
 }
 .crew-photo-overlay {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    padding: 2.2rem 1.6rem 1.4rem;
-    background: linear-gradient(180deg, transparent 0%, rgba(8,20,38,0.85) 70%, rgba(8,20,38,0.95) 100%);
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+    padding: 2.3rem 1.7rem 1.5rem;
+    background: linear-gradient(180deg, transparent 0%, rgba(8,20,38,0.88) 65%, rgba(8,20,38,0.97) 100%);
     color: #fff;
 }
 .crew-photo-toprow {
-    position: absolute; top: 1rem; left: 1rem; right: 1rem;
-    display: flex; align-items: center; justify-content: space-between;
+    position: absolute; top: 1.1rem; left: 1.1rem; right: 1.1rem; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
 }
 .crew-org-pill {
-    font-family: var(--mono); font-size: 0.72rem; font-weight: 700; color: #fff;
-    background: rgba(0,0,0,0.35); backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.2); border-radius: 100px;
-    padding: 0.35rem 0.85rem;
+    font-family: var(--mono); font-size: 0.75rem; font-weight: 800; color: #fff;
+    background: var(--tc); backdrop-filter: blur(6px);
+    border: 2px solid #fff; border-radius: 100px;
+    padding: 0.42rem 1rem; display: flex; align-items: center; gap: 0.42rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
 }
-.crew-photo-overlay .card-name { font-size: 1.5rem; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
-.crew-photo-overlay .card-team { color: var(--gold); font-size: 0.9rem; font-weight: 700; margin-top: 0.35rem; }
-.crew-body { padding: 1.6rem; }
-.card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.3rem; }
-.card-sub-line { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; }
+.crew-org-pill .ut-tent-tiny { font-size: 1rem; }
+.crew-org-pill .ut-accent { color: var(--gold); font-weight: 800; }
+.crew-photo-overlay .card-name { font-size: clamp(1.25rem, 4vw, 1.6rem); font-weight: 800; color: #fff; letter-spacing: -0.01em; }
+.crew-photo-overlay .card-team { color: var(--gold); font-size: 0.94rem; font-weight: 700; margin-top: 0.4rem; }
+.crew-body { padding: 1.7rem; position: relative; background: linear-gradient(160deg, var(--surface) 0%, var(--surface2) 100%); }
+.crew-body::after {
+    content: '⛺'; position: absolute; bottom: 0.7rem; right: 0.8rem; font-size: 2.8rem;
+    opacity: 0.06; pointer-events: none;
+}
+.card-sub-line { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; font-weight: 600; }
 .status-badge {
-    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.07em; border-radius: 100px; padding: 0.32rem 0.8rem;
+    font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.07em; border-radius: 100px; padding: 0.36rem 0.85rem;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.18);
 }
-.status-pending { background: rgba(234,140,0,0.12); color: #b45309; border: 1px solid rgba(234,140,0,0.32); }
-.status-approved { background: rgba(13,148,136,0.12); color: #0d9488; border: 1px solid rgba(13,148,136,0.32); }
-.status-rejected { background: rgba(220,38,38,0.10); color: #b91c1c; border: 1px solid rgba(220,38,38,0.32); }
-.id-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; padding: 1.2rem 0; border-top: 1px solid var(--border); margin-top: 1.2rem; }
-.id-item .id-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.35rem; }
+.status-pending { background: var(--amber); color: #fff; border: 2px solid #fff; }
+.status-approved { background: var(--green); color: #fff; border: 2px solid #fff; }
+.status-rejected { background: #dc2626; color: #fff; border: 2px solid #fff; }
+.id-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; padding: 1.3rem 0; border-top: 3px dashed var(--tc); margin-top: 1.3rem; }
+.id-item .id-label { font-size: 0.66rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--tc2); margin-bottom: 0.38rem; }
 .id-value {
-    font-family: var(--mono); font-size: 0.82rem; font-weight: 700; color: var(--tc);
-    background: var(--tg);
-    border: 1px solid color-mix(in srgb, var(--tc) 28%, transparent);
-    padding: 0.5rem 0.7rem; border-radius: 8px;
+    font-family: var(--mono); font-size: 0.84rem; font-weight: 800; color: var(--tc);
+    background: #fff;
+    border: 2px solid var(--tc);
+    padding: 0.55rem 0.75rem; border-radius: 10px;
     cursor: pointer; transition: all 0.2s; word-break: break-all;
     display: flex; align-items: center; justify-content: space-between; gap: 4px;
+    box-shadow: 3px 3px 0 var(--tg);
 }
-.id-value:hover { background: color-mix(in srgb, var(--tc) 18%, transparent); transform: translateY(-1px); }
-.id-copy { font-size: 0.7rem; opacity: 0.55; flex-shrink: 0; }
+.id-value:hover { background: var(--tg); transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--tg); }
+.id-copy { font-size: 0.75rem; opacity: 0.6; flex-shrink: 0; }
 
-/* Stats */
-.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
-.stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; text-align: center; }
-.stat-val { font-size: 1.6rem; font-weight: 800; color: var(--tc); font-family: var(--mono); }
-.stat-lbl { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.25rem; font-weight: 600; }
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+.stat-box { background: var(--tc); border: 2px solid var(--navy); border-radius: 16px; padding: 1.1rem; text-align: center; position: relative; overflow: hidden; box-shadow: 4px 4px 0 var(--tg); }
+.stat-box::before { content: ''; position: absolute; top: -10px; right: -10px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+.stat-val { font-size: 1.75rem; font-weight: 800; color: #fff; font-family: var(--mono); }
+.stat-lbl { font-size: 0.7rem; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.3rem; font-weight: 700; }
 
-/* Right column */
-.right-col { display: flex; flex-direction: column; gap: 1.3rem; }
+.right-col { display: flex; flex-direction: column; gap: 1.5rem; }
 
-/* Leaderboard */
 .leaderboard {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 24px; overflow: hidden;
-    box-shadow: 0 1px 2px rgba(15,39,66,0.04), 0 8px 24px -8px rgba(15,39,66,0.06);
+    background: var(--surface); border: 3px solid var(--green); border-radius: 26px; overflow: hidden;
+    box-shadow: 7px 7px 0 var(--green-pale), 0 16px 36px -10px rgba(13,148,136,0.16);
 }
 .lb-header {
-    padding: 1.4rem 1.6rem; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 1.6rem; border-bottom: 3px solid var(--green);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+    background: repeating-linear-gradient(135deg, var(--surface) 0 18px, var(--green-pale) 18px 36px);
 }
-.lb-header h2 { font-size: 1.05rem; font-weight: 800; }
-.lb-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
-.lb-badge { font-family: var(--mono); font-size: 0.7rem; font-weight: 600; color: var(--tc);
-    background: var(--tg); border: 1px solid color-mix(in srgb, var(--tc) 30%, transparent);
-    border-radius: 100px; padding: 0.3rem 0.7rem; white-space: nowrap; }
-.lb-list { padding: 1.2rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-@media(max-width: 560px) { .lb-list { grid-template-columns: 1fr; } }
+.lb-header h2 { font-size: clamp(0.98rem, 2.5vw, 1.08rem); font-weight: 800; }
+.lb-subtitle { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 600; }
+.lb-badge {
+    font-family: var(--mono); font-size: 0.72rem; font-weight: 700; color: #fff;
+    background: var(--green); border: none;
+    border-radius: 100px; padding: 0.34rem 0.85rem; white-space: nowrap;
+    box-shadow: 3px 3px 0 var(--green-pale);
+}
+.lb-list { padding: 1.3rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.1rem; }
 .lb-item {
-    border: 1px solid var(--border); border-radius: 20px;
+    border: 3px solid var(--border); border-radius: 22px;
     overflow: hidden; background: var(--surface);
     transition: transform 0.22s cubic-bezier(.2,.8,.2,1), box-shadow 0.22s;
     position: relative;
 }
-.lb-item:hover { transform: translateY(-5px); box-shadow: 0 14px 30px -10px rgba(15,39,66,0.16); }
-.lb-item.is-rank-1 { border-color: var(--gold); box-shadow: 0 8px 26px -8px rgba(245,158,11,0.3); }
+.lb-item:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 5px 9px 0 var(--surface2), 0 14px 30px -10px rgba(15,39,66,0.18); }
+.lb-item.is-rank-1 { border-color: var(--gold); }
 .lb-photo-block {
     position: relative; width: 100%; aspect-ratio: 4 / 3;
     background: linear-gradient(155deg, var(--navy) 0%, var(--navy2) 100%);
@@ -215,333 +346,478 @@
 }
 .lb-rank {
     position: absolute; top: 10px; left: 10px;
-    width: 36px; height: 36px; border-radius: 50%;
+    width: 38px; height: 38px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 1rem; flex-shrink: 0;
-    font-family: var(--mono); box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-    border: 2px solid rgba(255,255,255,0.6); z-index: 2;
+    font-weight: 700; font-size: 1.05rem; flex-shrink: 0;
+    font-family: var(--mono); box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+    border: 3px solid rgba(255,255,255,0.7); z-index: 2;
 }
 .rank-1 { background: linear-gradient(135deg, #fde68a, #f59e0b); color: #78350f; }
 .rank-2 { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: #fff; }
 .rank-3 { background: linear-gradient(135deg, #d6a567, #92400e); color: #fde68a; }
 .lb-points-tag {
     position: absolute; top: 10px; right: 10px; z-index: 2;
-    font-family: var(--mono); font-weight: 800; font-size: 0.9rem; color: #fff;
-    background: rgba(0,0,0,0.4); backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 100px; padding: 0.3rem 0.7rem;
+    font-family: var(--mono); font-weight: 800; font-size: 0.92rem; color: #78350f;
+    background: var(--gold); border: 2px solid #fff;
+    border-radius: 100px; padding: 0.32rem 0.75rem;
 }
 .lb-photo-overlay {
     position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
-    padding: 1.6rem 0.9rem 0.7rem;
-    background: linear-gradient(180deg, transparent 0%, rgba(8,20,38,0.88) 75%, rgba(8,20,38,0.96) 100%);
+    padding: 1.7rem 1rem 0.75rem;
+    background: linear-gradient(180deg, transparent 0%, rgba(8,20,38,0.9) 70%, rgba(8,20,38,0.97) 100%);
     color: #fff;
 }
-.lb-info { padding: 0.7rem 0.9rem 0.9rem; }
-.lb-name { font-weight: 700; font-size: 0.96rem; color: #fff; }
-.lb-meta { font-size: 0.76rem; color: var(--text-muted); margin-top: 0.25rem; }
-.lb-pts-label { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.2rem; font-weight: 600; }
+.lb-info { padding: 0.75rem 1rem 1rem; background: var(--surface2); }
+.lb-name { font-weight: 700; font-size: 0.98rem; color: #fff; }
+.lb-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem; font-weight: 600; }
+.lb-pts-label { font-size: 0.64rem; color: var(--tc2); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.25rem; font-weight: 700; }
 .lb-empty { padding: 2.5rem 1.5rem; text-align: center; color: var(--text-muted); }
 .lb-empty .lb-empty-icon { font-size: 2.6rem; margin-bottom: 0.6rem; }
 .lb-empty p { font-size: 0.92rem; line-height: 1.6; }
 
-/* Profile info card */
 .info-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 24px; padding: 1.7rem;
-    box-shadow: 0 1px 2px rgba(15,39,66,0.04), 0 8px 24px -8px rgba(15,39,66,0.06);
+    background: var(--surface); border: 3px solid var(--blue-border);
+    border-radius: 26px; padding: 1.8rem; position: relative; overflow: hidden;
+    box-shadow: 6px 6px 0 var(--blue-pale), 0 14px 32px -10px rgba(11,37,69,0.1);
 }
-.info-card h2 { font-size: 1.02rem; font-weight: 800; margin-bottom: 1.1rem; }
-.info-row { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.info-card::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 7px; background: repeating-linear-gradient(0deg, var(--tc) 0 10px, var(--gold) 10px 20px); }
+.info-card h2 { font-size: clamp(0.95rem, 2.5vw, 1.05rem); font-weight: 800; margin-bottom: 1.2rem; color: var(--navy); }
+.info-row { display: flex; gap: 1.6rem; flex-wrap: wrap; }
 .info-item { flex: 1; min-width: 130px; }
-.info-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 600; }
-.info-val { font-size: 0.92rem; font-weight: 600; }
-.info-link { color: var(--tc); text-decoration: none; font-size: 0.88rem; font-weight: 600; }
+.info-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--tc2); margin-bottom: 0.38rem; font-weight: 700; }
+.info-val { font-size: 0.94rem; font-weight: 700; word-break: break-word; }
+.info-link { color: var(--tc); text-decoration: none; font-size: 0.9rem; font-weight: 700; }
 .info-link:hover { text-decoration: underline; }
 
-/* Referral card */
 .referral-card {
-    background: linear-gradient(155deg, var(--surface) 0%, var(--surface2) 100%);
-    border: 1px solid var(--border);
-    border-radius: 24px; padding: 1.7rem;
-    box-shadow: 0 1px 2px rgba(15,39,66,0.04), 0 8px 24px -8px rgba(15,39,66,0.06);
+    background:
+        radial-gradient(circle at 100% 0%, var(--tg) 0%, transparent 45%),
+        repeating-linear-gradient(60deg, var(--surface) 0 20px, var(--surface2) 20px 40px);
+    border: 3px solid var(--gold);
+    border-radius: 26px; padding: 1.8rem;
+    box-shadow: 6px 6px 0 var(--amber-pale), 0 14px 32px -10px rgba(245,158,11,0.16);
+    position: relative; overflow: hidden;
 }
-.referral-card h2 { font-size: 1.02rem; font-weight: 800; margin-bottom: 0.45rem; }
-.referral-card p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.1rem; }
-.share-row { display: flex; gap: 0.6rem; }
+.referral-card::after {
+    content: '🏕️'; position: absolute; bottom: -25px; right: -12px;
+    font-size: 7rem; opacity: 0.09; transform: rotate(-12deg); pointer-events: none;
+}
+.referral-card h2 { font-size: clamp(0.95rem, 2.5vw, 1.05rem); font-weight: 800; margin-bottom: 0.5rem; position: relative; z-index: 1; color: var(--navy);}
+.referral-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.2rem; position: relative; z-index: 1; font-weight: 600; }
+.share-row { display: flex; gap: 0.65rem; flex-wrap: wrap; position: relative; z-index: 1; }
 .share-input {
-    flex: 1; background: var(--surface); border: 1.5px dashed var(--tc); border-opacity: 0.4;
-    border-radius: var(--radius); padding: 0.7rem 1rem;
-    color: var(--tc); font-family: var(--mono); font-size: 0.92rem;
-    font-weight: 700; cursor: pointer; transition: background 0.2s;
+    flex: 1; min-width: 140px; background: #fff; border: 3px dashed var(--tc);
+    border-radius: var(--radius); padding: 0.75rem 1.1rem;
+    color: var(--tc); font-family: var(--mono); font-size: 0.94rem;
+    font-weight: 800; cursor: pointer; transition: background 0.2s; word-break: break-all;
 }
 .share-input:hover { background: var(--tg); }
 
-/* Skills tags */
-.skills-text { color: var(--text-muted); font-size: 0.92rem; line-height: 1.7; }
+.skills-text { color: var(--text-muted); font-size: 0.94rem; line-height: 1.75; font-weight: 600; }
 
 .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
-    background: var(--navy); border: 1px solid var(--tc); color: #fff;
-    padding: 0.75rem 1.6rem; border-radius: 100px;
-    font-size: 0.85rem; font-weight: 600; font-family: var(--mono);
+    background: var(--navy); border: 3px solid var(--gold); color: #fff;
+    padding: 0.8rem 1.7rem; border-radius: 100px;
+    font-size: 0.86rem; font-weight: 700; font-family: var(--mono);
     opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none;
-    box-shadow: 0 8px 24px rgba(11,37,69,0.3); }
+    box-shadow: 0 10px 28px rgba(11,37,69,0.4); max-width: 90vw;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+/* ══════════════════════════════
+   RESPONSIVE — PHONE FIXES
+══════════════════════════════ */
+@media(max-width: 900px) {
+    .dash-grid { grid-template-columns: 1fr; }
+    .crew-photo-block { max-width: 100%; }
+}
+@media(max-width: 700px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 1.1rem; }
+    .hero-card.rank-1, .hero-card.rank-2, .hero-card.rank-3 { order: initial; }
+    .hero-card.rank-1 { transform: none; }
+    .hero-card.rank-1:hover { transform: translateY(-6px); }
+    .hero-photo-wrap { aspect-ratio: 16/10; }
+}
+@media(max-width: 560px) {
+    .lb-list { grid-template-columns: 1fr; }
+}
+@media(max-width: 640px) {
+    .page-content { padding: 1.6rem 1rem 0; }
+    .ci-1, .ci-2, .ci-3, .ci-4, .ci-5 { display: none; }
+    .ut-masthead { padding: 1.2rem 1.1rem; }
+    .ut-masthead::after { font-size: 6rem; }
+    .ut-masthead-tent2 { display: none; }
+    .ut-tent-badge { width: 46px; height: 46px; font-size: 1.5rem; border-radius: 12px; }
+    .ut-masthead-title { font-size: 1.08rem; }
+    .ut-masthead-sub { font-size: 0.64rem; }
+    .ut-pill { font-size: 0.66rem; padding: 0.34rem 0.75rem; }
+    .dash-header { padding: 1.1rem 1.2rem; gap: 0.8rem; }
+    .dash-header h1 { font-size: 1.45rem; }
+    .streak-chip { padding: 0.45rem 0.8rem; font-size: 0.74rem; min-width: 60px; }
+    .hero-performers { padding: 1.5rem; border-radius: 24px; }
+    .hero-head { flex-direction: column; align-items: flex-start; padding-left: 1.7rem; }
+    .hero-corner-tag { font-size: 0.62rem; padding: 0.28rem 0.85rem 0.28rem 1.1rem; }
+    .crew-body { padding: 1.3rem; }
+    .crew-photo-overlay { padding: 1.7rem 1.2rem 1.1rem; }
+    .crew-photo-toprow { top: 0.75rem; left: 0.75rem; right: 0.75rem; }
+    .crew-org-pill { font-size: 0.66rem; padding: 0.32rem 0.7rem; }
+    .status-badge { font-size: 0.62rem; padding: 0.3rem 0.65rem; }
+    .id-grid { grid-template-columns: 1fr; gap: 0.55rem; }
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .info-card, .referral-card { padding: 1.3rem; border-radius: 20px; }
+    .info-row { gap: 1.1rem; }
+    .lb-header { padding: 1.15rem 1.25rem; }
+    .lb-list { padding: 1rem; gap: 0.9rem; }
+}
+@media(max-width: 400px) {
+    .ut-masthead-row { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+    .stat-row { grid-template-columns: 1fr; }
+    .dash-streak { width: 100%; }
+}
 </style>
 {% endblock %}
-{% block hero %}{% endblock %}
 {% block content %}
-<div class="page">
-    <div class="dash-header">
-        <div>
-            <div class="welcome">Crew Dashboard</div>
-            <h1>Hey, <span>{{ profile.full_name.split.0 }}</span> 👋</h1>
-        </div>
-    </div>
 
-    <!-- HERO SECTION: TOP PERFORMERS WITH BIG PHOTOS -->
-    <div class="hero-performers">
-        <div class="hero-head">
+<!-- ══════════════════════════════════════════════
+     URBANTENANTS MASTHEAD — bold, loud, layered
+══════════════════════════════════════════════ -->
+<div class="ut-masthead">
+    <div class="ut-masthead-tent2">⛺</div>
+    <div class="ut-masthead-row">
+        <div class="ut-masthead-brand">
+            <div class="ut-tent-badge">🏕️</div>
             <div>
-                <h2>🏆 Top Performers</h2>
-                <div class="hero-subtitle">
-                    {{ profile.college_name }} ·
-                    {% if app.team == 'technical' %}Tech Team
-                    {% elif app.team == 'marketing' %}Marketing Team
-                    {% else %}Accommodation Partners{% endif %}
-                </div>
+                <div class="ut-masthead-title">Urban<span class="ut-accent">Tenants</span> CampusCrew</div>
+                <div class="ut-masthead-sub">Official Campus Ambassador Network</div>
             </div>
-            <div class="hero-badge">Reward Points</div>
         </div>
-
-        {% if top_performers %}
-        <div class="hero-grid">
-            {% for performer in top_performers %}
-            <div class="hero-card rank-{{ forloop.counter }}">
-                <div class="hero-photo-wrap">
-                    {% if performer.profile_photo %}
-                        <img src="{{ performer.profile_photo.url }}" class="hero-photo" alt="{{ performer.user.profile.full_name }}">
-                    {% else %}
-                        <div class="hero-photo-ph">
-                            {% if performer.team == 'technical' %}💻
-                            {% elif performer.team == 'marketing' %}📣
-                            {% else %}🏠{% endif %}
-                        </div>
-                    {% endif %}
-                    <div class="hero-rank-tag r{{ forloop.counter }}">
-                        {% if forloop.counter == 1 %}🥇
-                        {% elif forloop.counter == 2 %}🥈
-                        {% else %}🥉{% endif %}
-                    </div>
-                    <div class="hero-points-tag">{{ performer.reward_points }} pts</div>
-                    <div class="hero-photo-overlay">
-                        <div class="hero-name">{{ performer.user.profile.full_name }}</div>
-                        <div class="hero-meta">{{ performer.user.profile.branch }} · {{ performer.user.profile.get_year_display }}</div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+        <div class="ut-masthead-pills">
+            <div class="ut-pill green-dot">Live Dashboard</div>
+            <div class="ut-pill">🌐 urbantenants.com</div>
+            <div class="ut-pill gold">🏕️ UrbanTenants Verified</div>
         </div>
-        {% else %}
-        <div class="hero-empty">
-            <div class="hero-empty-icon">🚀</div>
-            <p>You could be the first! No performers yet from your college.<br>
-            <strong style="color:var(--tc);">Get to the top!</strong></p>
-        </div>
-        {% endif %}
     </div>
+</div>
+<div class="ut-ribbon"></div>
 
-    <div class="dash-grid">
-        <!-- LEFT: Crew ID Card -->
-        <div>
-            <div class="crew-card">
-                <div class="crew-photo-block">
-                    {% if app.profile_photo %}
-                        <img src="{{ app.profile_photo.url }}" alt="{{ profile.full_name }}">
-                    {% else %}
-                        <div class="photo-ph-big">👤</div>
-                    {% endif %}
-                    <div class="crew-photo-toprow">
-                        <div class="crew-org-pill">🎓 CampusCrew</div>
-                        <div class="status-badge status-{{ app.status }}">
-                            {% if app.status == 'pending' %}⏳ Pending
-                            {% elif app.status == 'approved' %}✅ Approved
-                            {% else %}❌ Rejected{% endif %}
-                        </div>
-                    </div>
-                    <div class="crew-photo-overlay">
-                        <div class="card-name">{{ profile.full_name }}</div>
-                        <div class="card-team">
-                            {% if app.team == 'technical' %}💻 Tech Team
-                            {% elif app.team == 'marketing' %}📣 Marketing Team
-                            {% else %}🏠 Accommodation Partner{% endif %}
-                        </div>
-                    </div>
-                </div>
-                <div class="crew-body">
-                    <div class="card-sub-line">
-                        {{ profile.college_name }}<br>
-                        {{ profile.branch }} · {{ profile.get_year_display }} · {{ profile.city }}
-                    </div>
+<div class="page">
+    <div class="dot-field"></div>
+    <div class="confetti-icon ci-1">🏕️</div>
+    <div class="confetti-icon ci-2">⛺</div>
+    <div class="confetti-icon ci-3">🏕️</div>
+    <div class="confetti-icon ci-4">⭐</div>
+    <div class="confetti-icon ci-5">🎯</div>
 
-                    <div class="id-grid">
-                        <div class="id-item">
-                            <div class="id-label">Crew ID</div>
-                            <div class="id-value" onclick="copyText('{{ app.crew_id }}', this)">
-                                <span>{{ app.crew_id }}</span>
-                                <span class="id-copy">📋</span>
-                            </div>
-                        </div>
-                        <div class="id-item">
-                            <div class="id-label">Referral Code</div>
-                            <div class="id-value" onclick="copyText('{{ app.referral_code }}', this)">
-                                <span>{{ app.referral_code }}</span>
-                                <span class="id-copy">📋</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-row">
-                        <div class="stat-box">
-                            <div class="stat-val">{{ app.referral_count }}</div>
-                            <div class="stat-lbl">Referrals</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-val">{{ app.reward_points }}</div>
-                            <div class="stat-lbl">Points</div>
-                        </div>
-                    </div>
-                </div>
+    <div class="page-content">
+        <div class="dash-header">
+            <div>
+                <div class="welcome">Crew Dashboard</div>
+                <h1>Hey, <span>{{ profile.full_name.split.0 }}</span> 👋</h1>
             </div>
-
-            <!-- Profile Info -->
-            <div class="info-card" style="margin-top: 1.3rem;">
-                <h2>📋 Profile Details</h2>
-                <div class="info-row">
-                    <div class="info-item">
-                        <div class="info-label">College</div>
-                        <div class="info-val">{{ profile.college_name }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">City</div>
-                        <div class="info-val">{{ profile.city }}</div>
-                    </div>
-                </div>
-                <div class="info-row" style="margin-top: 0.9rem;">
-                    <div class="info-item">
-                        <div class="info-label">Branch & Year</div>
-                        <div class="info-val">{{ profile.branch }} · {{ profile.get_year_display }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Phone</div>
-                        <div class="info-val">{{ profile.phone }}</div>
-                    </div>
-                </div>
-                <div class="info-row" style="margin-top: 0.9rem;">
-                    <div class="info-item">
-                        <div class="info-label">WhatsApp</div>
-                        <div class="info-val">{{ app.whatsapp }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Applied On</div>
-                        <div class="info-val">{{ app.applied_at|date:"d M Y" }}</div>
-                    </div>
-                </div>
-                {% if profile.github_url or profile.linkedin_url or profile.instagram_url or app.portfolio_url %}
-                <div class="info-row" style="margin-top: 0.9rem;">
-                    {% if profile.github_url %}
-                    <div class="info-item">
-                        <div class="info-label">GitHub</div>
-                        <a href="{{ profile.github_url }}" target="_blank" class="info-link">View Profile ↗</a>
-                    </div>
-                    {% endif %}
-                    {% if profile.linkedin_url %}
-                    <div class="info-item">
-                        <div class="info-label">LinkedIn</div>
-                        <a href="{{ profile.linkedin_url }}" target="_blank" class="info-link">View Profile ↗</a>
-                    </div>
-                    {% endif %}
-                    {% if profile.instagram_url %}
-                    <div class="info-item">
-                        <div class="info-label">Instagram</div>
-                        <a href="{{ profile.instagram_url }}" target="_blank" class="info-link">View Profile ↗</a>
-                    </div>
-                    {% endif %}
-                    {% if app.portfolio_url %}
-                    <div class="info-item">
-                        <div class="info-label">Portfolio</div>
-                        <a href="{{ app.portfolio_url }}" target="_blank" class="info-link">View Site ↗</a>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Why You Joined -->
-            <div class="info-card" style="margin-top: 1.3rem;">
-                <h2>💬 Why You Joined</h2>
-                <div class="skills-text">{{ app.why_join }}</div>
+            <div class="dash-streak">
+                <div class="streak-chip gold">{{ app.reward_points }}<small>Points</small></div>
+                <div class="streak-chip green">{{ app.referral_count }}<small>Referrals</small></div>
             </div>
         </div>
 
-        <!-- RIGHT: Referral + Skills -->
-        <div class="right-col">
-
-            <!-- REFERRAL CARD -->
-            <div class="referral-card">
-                <h2>🔗 Share Your Referral Code</h2>
-                <p>Invite friends to join CampusCrew and earn reward points!</p>
-                <div class="share-row">
-                    <input class="share-input" value="{{ app.referral_code }}" readonly onclick="copyText('{{ app.referral_code }}', this)">
-                    <button class="btn btn-primary" onclick="copyText('{{ app.referral_code }}')">Copy</button>
+        <!-- HERO SECTION: TOP PERFORMERS WITH BIG PHOTOS -->
+        <div class="hero-performers">
+            <div class="hero-corner-tag">🏕️ UrbanTenants Pick</div>
+            <div class="hero-stars">✨</div>
+            <div class="hero-head">
+                <div>
+                    <h2>🏆 Top Performers</h2>
+                    <div class="hero-subtitle">
+                        {{ profile.college_name }} ·
+                        {% if app.team == 'technical' %}Tech Team
+                        {% elif app.team == 'marketing' %}Marketing Team
+                        {% else %}Accommodation Partners{% endif %}
+                    </div>
                 </div>
-                <p style="margin-top: 0.9rem; font-size: 0.82rem; color: var(--text-muted);">
-                    Your unique Crew ID and referral code are the same: <code style="color:var(--tc); font-family:var(--mono);">{{ app.referral_code }}</code>
-                </p>
+                <div class="hero-badge">Reward Points</div>
             </div>
 
-            <!-- Application Skills -->
-            <div class="info-card">
-                <h2>🛠️ Your Skills</h2>
-                <div class="skills-text">
-                    {{ app.skills }}
+            {% if top_performers %}
+            <div class="hero-grid">
+                {% for performer in top_performers %}
+                <div class="hero-card rank-{{ forloop.counter }}">
+                    <div class="hero-photo-wrap">
+                        {% if performer.profile_photo %}
+                            <img src="{{ performer.profile_photo.url }}" class="hero-photo" alt="{{ performer.user.profile.full_name }}">
+                        {% else %}
+                            <div class="hero-photo-ph">
+                                {% if performer.team == 'technical' %}💻
+                                {% elif performer.team == 'marketing' %}📣
+                                {% else %}🏠{% endif %}
+                            </div>
+                        {% endif %}
+                        <div class="hero-rank-tag r{{ forloop.counter }}">
+                            {% if forloop.counter == 1 %}🥇
+                            {% elif forloop.counter == 2 %}🥈
+                            {% else %}🥉{% endif %}
+                        </div>
+                        <div class="hero-points-tag">{{ performer.reward_points }} pts</div>
+                        <div class="hero-photo-overlay">
+                            <div class="hero-name">{{ performer.user.profile.full_name }}</div>
+                            <div class="hero-meta">{{ performer.user.profile.branch }} · {{ performer.user.profile.get_year_display }}</div>
+                        </div>
+                    </div>
                 </div>
-                {% if app.experience %}
-                <div style="margin-top: 0.9rem;">
-                    <div class="info-label">Experience</div>
-                    <div class="skills-text" style="margin-top: 0.35rem;">{{ app.experience }}</div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="hero-empty">
+                <div class="hero-empty-icon">🚀</div>
+                <p>You could be the first! No performers yet from your college.<br>
+                <strong style="color:var(--tc);">Get to the top!</strong></p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="dash-grid">
+            <!-- LEFT: Crew ID Card -->
+            <div>
+                <div class="crew-card">
+                    <div class="crew-photo-block">
+                        {% if app.profile_photo %}
+                            <img src="{{ app.profile_photo.url }}" alt="{{ profile.full_name }}">
+                        {% else %}
+                            <div class="photo-ph-big">👤</div>
+                        {% endif %}
+                        <div class="crew-photo-toprow">
+                            <div class="crew-org-pill"><span class="ut-tent-tiny">🏕️</span> Urban<span class="ut-accent">Tenants</span></div>
+                            <div class="status-badge status-{{ app.status }}">
+                                {% if app.status == 'pending' %}⏳ Pending
+                                {% elif app.status == 'approved' %}✅ Approved
+                                {% else %}❌ Rejected{% endif %}
+                            </div>
+                        </div>
+                        <div class="crew-photo-overlay">
+                            <div class="card-name">{{ profile.full_name }}</div>
+                            <div class="card-team">
+                                {% if app.team == 'technical' %}💻 Tech Team
+                                {% elif app.team == 'marketing' %}📣 Marketing Team
+                                {% else %}🏠 Accommodation Partner{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="crew-body">
+                        <div class="card-sub-line">
+                            {{ profile.college_name }}<br>
+                            {{ profile.branch }} · {{ profile.get_year_display }} · {{ profile.city }}
+                        </div>
+
+                        <div class="id-grid">
+                            <div class="id-item">
+                                <div class="id-label">Crew ID</div>
+                                <div class="id-value" onclick="copyText('{{ app.crew_id }}', this)">
+                                    <span>{{ app.crew_id }}</span>
+                                    <span class="id-copy">📋</span>
+                                </div>
+                            </div>
+                            <div class="id-item">
+                                <div class="id-label">Referral Code</div>
+                                <div class="id-value" onclick="copyText('{{ app.referral_code }}', this)">
+                                    <span>{{ app.referral_code }}</span>
+                                    <span class="id-copy">📋</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="stat-box">
+                                <div class="stat-val">{{ app.referral_count }}</div>
+                                <div class="stat-lbl">Referrals</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val">{{ app.reward_points }}</div>
+                                <div class="stat-lbl">Points</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% endif %}
-                {% if app.team == 'technical' and app.tech_stack %}
-                <div style="margin-top: 0.9rem;">
-                    <div class="info-label">Tech Stack</div>
-                    <div style="font-family: var(--mono); color: var(--tc); font-size: 0.88rem; margin-top: 0.35rem;">{{ app.tech_stack }}</div>
+
+                <!-- Profile Info -->
+                <div class="info-card" style="margin-top: 1.4rem;">
+                    <h2>📋 Profile Details</h2>
+                    <div class="info-row">
+                        <div class="info-item">
+                            <div class="info-label">College</div>
+                            <div class="info-val">{{ profile.college_name }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">City</div>
+                            <div class="info-val">{{ profile.city }}</div>
+                        </div>
+                    </div>
+                    <div class="info-row" style="margin-top: 0.95rem;">
+                        <div class="info-item">
+                            <div class="info-label">Branch & Year</div>
+                            <div class="info-val">{{ profile.branch }} · {{ profile.get_year_display }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Phone</div>
+                            <div class="info-val">{{ profile.phone }}</div>
+                        </div>
+                    </div>
+                    <div class="info-row" style="margin-top: 0.95rem;">
+                        <div class="info-item">
+                            <div class="info-label">WhatsApp</div>
+                            <div class="info-val">{{ app.whatsapp }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Applied On</div>
+                            <div class="info-val">{{ app.applied_at|date:"d M Y" }}</div>
+                        </div>
+                    </div>
+                    {% if profile.github_url or profile.linkedin_url or profile.instagram_url or app.portfolio_url %}
+                    <div class="info-row" style="margin-top: 0.95rem;">
+                        {% if profile.github_url %}
+                        <div class="info-item">
+                            <div class="info-label">GitHub</div>
+                            <a href="{{ profile.github_url }}" target="_blank" class="info-link">View Profile ↗</a>
+                        </div>
+                        {% endif %}
+                        {% if profile.linkedin_url %}
+                        <div class="info-item">
+                            <div class="info-label">LinkedIn</div>
+                            <a href="{{ profile.linkedin_url }}" target="_blank" class="info-link">View Profile ↗</a>
+                        </div>
+                        {% endif %}
+                        {% if profile.instagram_url %}
+                        <div class="info-item">
+                            <div class="info-label">Instagram</div>
+                            <a href="{{ profile.instagram_url }}" target="_blank" class="info-link">View Profile ↗</a>
+                        </div>
+                        {% endif %}
+                        {% if app.portfolio_url %}
+                        <div class="info-item">
+                            <div class="info-label">Portfolio</div>
+                            <a href="{{ app.portfolio_url }}" target="_blank" class="info-link">View Site ↗</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-                {% if app.team == 'marketing' and app.social_media_handles %}
-                <div style="margin-top: 0.9rem;">
-                    <div class="info-label">Social Media</div>
-                    <div style="color: var(--tc); font-size: 0.88rem; margin-top: 0.35rem;">{{ app.social_media_handles }}</div>
+
+                <!-- Why You Joined -->
+                <div class="info-card" style="margin-top: 1.4rem;">
+                    <h2>💬 Why You Joined</h2>
+                    <div class="skills-text">{{ app.why_join }}</div>
                 </div>
-                {% endif %}
-                {% if app.team == 'marketing' and app.campaign_idea %}
-                <div style="margin-top: 0.9rem;">
-                    <div class="info-label">Campaign Idea</div>
-                    <div class="skills-text" style="margin-top: 0.35rem;">{{ app.campaign_idea }}</div>
+            </div>
+
+            <!-- RIGHT: Leaderboard + Referral + Skills -->
+            <div class="right-col">
+
+                <!-- LEADERBOARD -->
+                <div class="leaderboard">
+                    <div class="lb-header">
+                        <div>
+                            <h2>📊 Leaderboard</h2>
+                            <div class="lb-subtitle">
+                                {{ profile.college_name }} ·
+                                {% if app.team == 'technical' %}Tech Team
+                                {% elif app.team == 'marketing' %}Marketing Team
+                                {% else %}Accommodation Partners{% endif %}
+                            </div>
+                        </div>
+                        <div class="lb-badge">Reward Points</div>
+                    </div>
+                    <div class="lb-list">
+                        {% if top_performers %}
+                            {% for performer in top_performers %}
+                            <div class="lb-item {% if forloop.counter == 1 %}is-rank-1{% endif %}">
+                                <div class="lb-photo-block">
+                                    {% if performer.profile_photo %}
+                                        <img src="{{ performer.profile_photo.url }}" alt="{{ performer.user.profile.full_name }}">
+                                    {% else %}
+                                        <div class="lb-photo-ph">
+                                            {% if performer.team == 'technical' %}💻
+                                            {% elif performer.team == 'marketing' %}📣
+                                            {% else %}🏠{% endif %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="lb-rank rank-{{ forloop.counter }}">
+                                        {% if forloop.counter == 1 %}🥇
+                                        {% elif forloop.counter == 2 %}🥈
+                                        {% else %}🥉{% endif %}
+                                    </div>
+                                    <div class="lb-points-tag">{{ performer.reward_points }} pts</div>
+                                </div>
+                                <div class="lb-info">
+                                    <div class="lb-name" style="color: var(--navy);">{{ performer.user.profile.full_name }}</div>
+                                    <div class="lb-meta">{{ performer.user.profile.branch }} · {{ performer.user.profile.get_year_display }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="lb-empty">
+                                <div class="lb-empty-icon">🚀</div>
+                                <p>You could be the first!<br>
+                                No performers yet from your college.<br>
+                                <strong style="color:var(--tc);">Get to the top!</strong></p>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endif %}
-                {% if app.team == 'accommodation' and app.city_area %}
-                <div style="margin-top: 0.9rem;">
-                    <div class="info-label">Area</div>
-                    <div style="color: var(--tc); font-size: 0.88rem; margin-top: 0.35rem;">{{ app.city_area }}</div>
+
+                <!-- REFERRAL CARD -->
+                <div class="referral-card">
+                    <h2>🔗 Share Your Referral Code</h2>
+                    <p>Invite friends to join CampusCrew and earn reward points!</p>
+                    <div class="share-row">
+                        <input class="share-input" value="{{ app.referral_code }}" readonly onclick="copyText('{{ app.referral_code }}', this)">
+                        <button class="btn btn-primary" onclick="copyText('{{ app.referral_code }}')">Copy</button>
+                    </div>
+                    <p style="margin-top: 0.95rem; font-size: 0.84rem; color: var(--text-muted); position: relative; z-index: 1;">
+                        Your unique Crew ID and referral code are the same: <code style="color:var(--tc); font-family:var(--mono);">{{ app.referral_code }}</code>
+                    </p>
                 </div>
-                {% endif %}
-                {% if app.team == 'accommodation' and app.accommodation_type %}
-                <div style="margin-top: 0.9rem;">
-                    <div class="info-label">Accommodation Type</div>
-                    <div style="color: var(--tc); font-size: 0.88rem; margin-top: 0.35rem;">{{ app.accommodation_type }}</div>
+
+                <!-- Application Skills -->
+                <div class="info-card">
+                    <h2>🛠️ Your Skills</h2>
+                    <div class="skills-text">
+                        {{ app.skills }}
+                    </div>
+                    {% if app.experience %}
+                    <div style="margin-top: 0.95rem;">
+                        <div class="info-label">Experience</div>
+                        <div class="skills-text" style="margin-top: 0.35rem;">{{ app.experience }}</div>
+                    </div>
+                    {% endif %}
+                    {% if app.team == 'technical' and app.tech_stack %}
+                    <div style="margin-top: 0.95rem;">
+                        <div class="info-label">Tech Stack</div>
+                        <div style="font-family: var(--mono); color: var(--tc); font-size: 0.9rem; margin-top: 0.35rem;">{{ app.tech_stack }}</div>
+                    </div>
+                    {% endif %}
+                    {% if app.team == 'marketing' and app.social_media_handles %}
+                    <div style="margin-top: 0.95rem;">
+                        <div class="info-label">Social Media</div>
+                        <div style="color: var(--tc); font-size: 0.9rem; margin-top: 0.35rem;">{{ app.social_media_handles }}</div>
+                    </div>
+                    {% endif %}
+                    {% if app.team == 'marketing' and app.campaign_idea %}
+                    <div style="margin-top: 0.95rem;">
+                        <div class="info-label">Campaign Idea</div>
+                        <div class="skills-text" style="margin-top: 0.35rem;">{{ app.campaign_idea }}</div>
+                    </div>
+                    {% endif %}
+                    {% if app.team == 'accommodation' and app.city_area %}
+                    <div style="margin-top: 0.95rem;">
+                        <div class="info-label">Area</div>
+                        <div style="color: var(--tc); font-size: 0.9rem; margin-top: 0.35rem;">{{ app.city_area }}</div>
+                    </div>
+                    {% endif %}
+                    {% if app.team == 'accommodation' and app.accommodation_type %}
+                    <div style="margin-top: 0.95rem;">
+                        <div class="info-label">Accommodation Type</div>
+                        <div style="color: var(--tc); font-size: 0.9rem; margin-top: 0.35rem;">{{ app.accommodation_type }}</div>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>

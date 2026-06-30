@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CampusCrew — UrbanTents{% endblock %}</title>
+    <title>{% block title %}CampusCrew — UrbanTenants{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -36,77 +36,111 @@
             --shadow-md: 0 4px 12px rgba(11,37,69,0.09), 0 8px 32px rgba(11,37,69,0.07);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+        body {
+            font-family: var(--sans); background: var(--bg); color: var(--text);
+            min-height: 100vh; perspective: 1800px;
+        }
         h1, h2, h3, .nav-logo, .btn { font-family: var(--head); }
 
-        /* ── NAV ── */
+        /* ── NAV — floating 3D bar ── */
         .nav {
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 2rem; height: 66px;
-            background: rgba(255,255,255,0.93);
+            background: rgba(255,255,255,0.95);
             backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
             position: sticky; top: 0; z-index: 200;
-            box-shadow: 0 1px 4px rgba(11,37,69,0.07);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 4px 18px rgba(11,37,69,0.10);
         }
         .nav-logo {
             font-weight: 800; font-size: 1.1rem; color: var(--navy);
             text-decoration: none; display: flex; align-items: center; gap: 8px;
             letter-spacing: -0.01em;
         }
+        .nav-logo .nav-tent {
+            display: inline-flex; transform-style: preserve-3d;
+            filter: drop-shadow(2px 4px 3px rgba(11,37,69,0.35));
+            transition: transform 0.3s ease;
+        }
+        .nav-logo:hover .nav-tent { transform: rotateY(20deg) rotateX(-8deg) scale(1.1); }
         .nav-logo span { color: var(--blue); }
         .nav-logo .nav-sub {
             font-family: var(--sans); font-size: 0.68rem; font-weight: 600;
             color: var(--text-muted); background: var(--surface2);
             border: 1px solid var(--border); border-radius: 100px;
             padding: 0.12rem 0.55rem; margin-left: 2px;
+            box-shadow: 0 1px 2px rgba(11,37,69,0.08);
         }
         .nav-links { display: flex; gap: 0.4rem; align-items: center; }
         .nav-links a {
             color: var(--text-muted); text-decoration: none; font-size: 0.875rem;
-            font-weight: 500; padding: 0.4rem 0.75rem; border-radius: 8px; transition: all 0.15s;
+            font-weight: 500; padding: 0.4rem 0.75rem; border-radius: 8px; transition: all 0.18s;
         }
-        .nav-links a:hover { color: var(--navy); background: var(--surface2); }
+        .nav-links a:hover { color: var(--navy); background: var(--surface2); transform: translateY(-1px); }
         .btn {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 0.55rem 1.2rem; border-radius: var(--radius);
             font-weight: 600; font-size: 0.875rem;
             cursor: pointer; border: none; text-decoration: none; transition: all 0.18s;
         }
-        .btn-primary { background: var(--blue-pale); color: var(--blue); border: 1.5px solid var(--blue-border); box-shadow: none; }
-        .btn-primary:hover { background: #dbeafe; border-color: var(--blue); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29,78,216,0.15); }
-        .btn-ghost { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); }
-        .btn-ghost:hover { border-color: var(--blue-border); color: var(--navy); }
+        .btn-primary {
+            background: var(--blue-pale); color: var(--blue); border: 1.5px solid var(--blue-border);
+            box-shadow: 0 2px 0 var(--blue-border), 0 3px 8px rgba(29,78,216,0.12);
+        }
+        .btn-primary:hover {
+            background: #dbeafe; border-color: var(--blue); transform: translateY(-2px);
+            box-shadow: 0 4px 0 var(--blue-border), 0 8px 18px rgba(29,78,216,0.22);
+        }
+        .btn-primary:active { transform: translateY(0); box-shadow: 0 1px 0 var(--blue-border); }
+        .btn-ghost { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(11,37,69,0.06); }
+        .btn-ghost:hover { border-color: var(--blue-border); color: var(--navy); transform: translateY(-1px); }
 
         /* ── MESSAGES ── */
         .messages-container { max-width: 620px; margin: 1rem auto; padding: 0 1rem; }
-        .msg { padding: 0.75rem 1rem; border-radius: var(--radius); margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500; }
+        .msg { padding: 0.75rem 1rem; border-radius: var(--radius); margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500;
+            box-shadow: 0 3px 10px rgba(11,37,69,0.08); }
         .msg.success { background: var(--green-pale); border: 1px solid var(--green-border); color: #065f46; }
         .msg.error   { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
         .msg.warning { background: var(--amber-pale); border: 1px solid var(--amber-border); color: #92400e; }
 
-        /* ── HERO ── */
+        /* ══════════════════════════════════════
+           HERO — full 3D depth treatment
+        ══════════════════════════════════════ */
         .hero {
             position: relative; overflow: hidden;
             background: linear-gradient(135deg, #0b2545 0%, #1a3560 45%, #0f4c81 100%);
-            padding: 5.5rem 2rem 5rem; text-align: center;
+            padding: 6rem 2rem 6.5rem; text-align: center;
+            transform-style: preserve-3d;
         }
         .hero-mesh {
             position: absolute; inset: 0; z-index: 0;
             background:
-                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(59,130,246,0.18) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(16,185,129,0.13) 0%, transparent 55%),
-                radial-gradient(ellipse 50% 40% at 65% 10%, rgba(245,158,11,0.11) 0%, transparent 50%);
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(59,130,246,0.20) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(16,185,129,0.14) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 65% 10%, rgba(245,158,11,0.12) 0%, transparent 50%);
             animation: meshPulse 8s ease-in-out infinite alternate;
         }
-        @keyframes meshPulse {
-            0%   { opacity: 0.8; transform: scale(1); }
-            100% { opacity: 1;   transform: scale(1.04); }
+        @keyframes meshPulse { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 1; transform: scale(1.04); } }
+
+        /* 3D floating tent shapes with layered drop shadows for depth */
+        .hero-3d-tent {
+            position: absolute; z-index: 0; pointer-events: none;
+            transform-style: preserve-3d;
+            filter:
+                drop-shadow(0 8px 6px rgba(0,0,0,0.30))
+                drop-shadow(0 20px 24px rgba(0,0,0,0.22));
         }
-        .hero-blob {
-            position: absolute; border-radius: 50%;
-            filter: blur(65px); z-index: 0; pointer-events: none;
+        .tent-a { top: 8%; left: 6%; font-size: 4.4rem; animation: floatTent3D 7s ease-in-out infinite; }
+        .tent-b { top: 58%; right: 8%; font-size: 3.2rem; animation: floatTent3D 9s ease-in-out infinite 1.2s reverse; opacity: 0.92; }
+        .tent-c { bottom: 10%; left: 14%; font-size: 2.6rem; animation: floatTent3D 8s ease-in-out infinite 2.4s; opacity: 0.85; }
+        @keyframes floatTent3D {
+            0%, 100% { transform: translateY(0) rotateY(0deg) rotateX(0deg); }
+            25%      { transform: translateY(-16px) rotateY(14deg) rotateX(6deg); }
+            50%      { transform: translateY(4px) rotateY(-10deg) rotateX(-4deg); }
+            75%      { transform: translateY(-10px) rotateY(8deg) rotateX(3deg); }
         }
+
+        .hero-blob { position: absolute; border-radius: 50%; filter: blur(65px); z-index: 0; pointer-events: none; }
         .blob-1 { width: 360px; height: 360px; background: rgba(59,130,246,0.22); top: -90px; left: -90px; animation: blobFloat 9s ease-in-out infinite; }
         .blob-2 { width: 280px; height: 280px; background: rgba(245,158,11,0.15); bottom: -70px; right: 4%; animation: blobFloat 11s ease-in-out infinite reverse; }
         .blob-3 { width: 220px; height: 220px; background: rgba(16,185,129,0.14); top: 28%; right: 12%; animation: blobFloat 13s ease-in-out infinite 2s; }
@@ -120,99 +154,118 @@
             background-image: radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px);
             background-size: 36px 36px;
         }
-        .hero-inner { position: relative; z-index: 1; max-width: 840px; margin: 0 auto; }
+        .hero-inner { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; transform-style: preserve-3d; }
 
+        /* 3D raised badge — looks embossed */
         .hero-badge {
             display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.22);
+            background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+            border: 1px solid rgba(255,255,255,0.26);
+            border-top-color: rgba(255,255,255,0.45);
             backdrop-filter: blur(8px); border-radius: 100px;
-            padding: 0.42rem 1.1rem; font-size: 0.8rem; font-weight: 600;
-            color: #e0f0ff; margin-bottom: 1.8rem; font-family: var(--sans);
+            padding: 0.45rem 1.2rem; font-size: 0.8rem; font-weight: 600;
+            color: #e0f0ff; margin-bottom: 2rem; font-family: var(--sans);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
             animation: fadeUp 0.7s ease both;
         }
-        .badge-dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: #34d399; box-shadow: 0 0 6px #34d399;
-            animation: pulseDot 2s ease-in-out infinite;
-        }
+        .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399, 0 0 2px #fff; animation: pulseDot 2s ease-in-out infinite; }
         @keyframes pulseDot { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.6);opacity:0.6;} }
 
+        /* 3D extruded headline using layered text-shadow for depth */
         .hero h1 {
-            font-size: clamp(2.3rem, 5.5vw, 3.8rem); font-weight: 800;
+            font-size: clamp(2.4rem, 5.8vw, 4rem); font-weight: 800;
             color: #fff; line-height: 1.10; letter-spacing: -0.03em;
-            margin-bottom: 1.2rem; animation: fadeUp 0.75s ease 0.1s both;
+            margin-bottom: 1.3rem; animation: fadeUp 0.75s ease 0.1s both;
+            text-shadow:
+                0 1px 0 #d8e6ff, 0 2px 0 #c2d8ff, 0 3px 0 #aacaff,
+                0 4px 6px rgba(0,0,0,0.35), 0 12px 22px rgba(0,0,0,0.30);
         }
-        .hl-blue  { color: #60a5fa; }
-        .hl-amber { color: #fbbf24; }
-        .hl-green { color: #34d399; }
+        .hl-blue  { color: #60a5fa; text-shadow: 0 1px 0 #1e3a8a, 0 2px 0 #1e40af, 0 4px 10px rgba(30,64,175,0.5); }
+        .hl-amber { color: #fbbf24; text-shadow: 0 1px 0 #92400e, 0 2px 0 #78350f, 0 4px 10px rgba(120,53,15,0.5); }
+        .hl-green { color: #34d399; text-shadow: 0 1px 0 #065f46, 0 2px 0 #064e3b, 0 4px 10px rgba(6,78,59,0.5); }
 
         .hero-sub {
-            font-size: clamp(1rem, 2vw, 1.18rem); color: rgba(224,240,255,0.78);
-            max-width: 580px; margin: 0 auto 2.4rem; line-height: 1.72;
+            font-size: clamp(1rem, 2vw, 1.18rem); color: rgba(224,240,255,0.80);
+            max-width: 590px; margin: 0 auto 2.6rem; line-height: 1.72;
             animation: fadeUp 0.75s ease 0.2s both;
         }
-        .hero-cta {
-            display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
-            margin-bottom: 3rem; animation: fadeUp 0.75s ease 0.3s both;
-        }
+
+        /* 3D pressable buttons */
+        .hero-cta { display: flex; gap: 1.1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3.2rem; animation: fadeUp 0.75s ease 0.3s both; }
         .btn-hero-p {
-            background: var(--blue); color: #fff; padding: 0.9rem 2.1rem;
+            background: linear-gradient(180deg, #3b82f6, var(--blue));
+            color: #fff; padding: 0.95rem 2.2rem;
             font-size: 1rem; border-radius: var(--radius);
-            box-shadow: 0 4px 22px rgba(29,78,216,0.52);
+            box-shadow: 0 5px 0 #1640a8, 0 10px 26px rgba(29,78,216,0.5);
             font-family: var(--head); font-weight: 700; border: none;
             text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
-            transition: all 0.18s; cursor: pointer;
+            transition: all 0.15s; cursor: pointer;
         }
-        .btn-hero-p:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(29,78,216,0.58); }
+        .btn-hero-p:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #1640a8, 0 16px 34px rgba(29,78,216,0.55); }
+        .btn-hero-p:active { transform: translateY(2px); box-shadow: 0 2px 0 #1640a8, 0 6px 14px rgba(29,78,216,0.4); }
         .btn-hero-s {
-            background: rgba(255,255,255,0.10); color: #fff;
-            border: 1.5px solid rgba(255,255,255,0.32); padding: 0.9rem 2.1rem;
-            font-size: 1rem; border-radius: var(--radius); backdrop-filter: blur(8px);
-            font-family: var(--head); font-weight: 600;
+            background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+            color: #fff; border: 1.5px solid rgba(255,255,255,0.34);
+            border-top-color: rgba(255,255,255,0.5);
+            padding: 0.95rem 2.2rem; font-size: 1rem; border-radius: var(--radius);
+            backdrop-filter: blur(8px); font-family: var(--head); font-weight: 600;
             text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
-            transition: all 0.18s; cursor: pointer;
+            transition: all 0.15s; cursor: pointer;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.25);
         }
-        .btn-hero-s:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.65); transform: translateY(-2px); }
+        .btn-hero-s:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); box-shadow: 0 8px 0 rgba(0,0,0,0.22); }
+        .btn-hero-s:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
 
+        /* 3D stat cards — raised tiles, not flat dividers */
         .hero-stats {
-            display: flex; justify-content: center; flex-wrap: wrap;
-            border-top: 1px solid rgba(255,255,255,0.10);
-            padding-top: 2.4rem; margin-bottom: 2rem;
-            animation: fadeUp 0.75s ease 0.42s both;
+            display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+            margin-bottom: 2.2rem; animation: fadeUp 0.75s ease 0.42s both;
         }
-        .stat-item { padding: 0.7rem 2rem; border-right: 1px solid rgba(255,255,255,0.14); text-align: center; }
-        .stat-item:last-child { border-right: none; }
-        .stat-num {
-            font-family: var(--head); font-size: 1.9rem; font-weight: 800;
-            color: #fff; line-height: 1; letter-spacing: -0.02em;
+        .stat-item {
+            background: linear-gradient(165deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));
+            border: 1px solid rgba(255,255,255,0.18);
+            border-top-color: rgba(255,255,255,0.35);
+            border-radius: 16px;
+            padding: 1rem 1.7rem; text-align: center;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.18), 0 16px 28px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.25);
+            transition: transform 0.25s ease;
         }
+        .stat-item:hover { transform: translateY(-5px) rotateX(4deg); }
+        .stat-num { font-family: var(--head); font-size: 2rem; font-weight: 800; color: #fff; line-height: 1; letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
         .stat-plus { color: #60a5fa; }
-        .stat-lbl { font-size: 0.75rem; color: rgba(224,240,255,0.55); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.08em; }
+        .stat-lbl { font-size: 0.75rem; color: rgba(224,240,255,0.62); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.08em; }
 
-        .hero-teams {
-            display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap;
-            animation: fadeUp 0.75s ease 0.54s both;
-        }
+        /* 3D team chips — popping pills */
+        .hero-teams { display: flex; justify-content: center; gap: 0.7rem; flex-wrap: wrap; animation: fadeUp 0.75s ease 0.54s both; }
         .team-chip {
             display: inline-flex; align-items: center; gap: 7px;
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
-            backdrop-filter: blur(8px); border-radius: 100px;
-            padding: 0.48rem 1.1rem; font-size: 0.83rem; font-weight: 600;
-            color: #e0f0ff; text-decoration: none; transition: all 0.18s;
+            background: linear-gradient(165deg, rgba(255,255,255,0.13), rgba(255,255,255,0.04));
+            border: 1px solid rgba(255,255,255,0.2); border-top-color: rgba(255,255,255,0.4);
+            border-radius: 100px;
+            padding: 0.55rem 1.2rem; font-size: 0.83rem; font-weight: 600;
+            color: #e0f0ff; text-decoration: none; transition: all 0.2s;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.16), 0 8px 16px rgba(0,0,0,0.2);
         }
-        .team-chip:hover { background: rgba(255,255,255,0.17); transform: translateY(-2px); }
+        .team-chip:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 7px 0 rgba(0,0,0,0.18), 0 14px 24px rgba(0,0,0,0.26); }
+        .team-chip:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0,0,0,0.16); }
         .chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .chip-blue  { background: #60a5fa; box-shadow: 0 0 7px #3b82f6; }
         .chip-amber { background: #fbbf24; box-shadow: 0 0 7px #f59e0b; }
         .chip-green { background: #34d399; box-shadow: 0 0 7px #10b981; }
 
-        .hero-scroll {
-            position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-            z-index: 1; animation: bounce 2.6s ease-in-out infinite;
+        .hero-scroll { position: absolute; bottom: 1.7rem; left: 50%; transform: translateX(-50%); z-index: 1; animation: bounce 2.6s ease-in-out infinite; }
+        .hero-scroll svg { width: 24px; opacity: 0.45; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(10px);} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(24px) rotateX(-6deg);} to{opacity:1;transform:translateY(0) rotateX(0);} }
+
+        @media(max-width: 640px) {
+            .hero { padding: 4.5rem 1.2rem 5rem; }
+            .hero-3d-tent { display: none; }
+            .hero-stats { gap: 0.7rem; }
+            .stat-item { padding: 0.8rem 1.1rem; }
+            .stat-num { font-size: 1.5rem; }
         }
-        .hero-scroll svg { width: 22px; opacity: 0.38; }
-        @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(9px);} }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -221,7 +274,7 @@
 <!-- NAV -->
 <nav class="nav">
     <a href="/" class="nav-logo">
-        🏕️ UrbanTenants <span>·</span> CampusCrew
+        <span class="nav-tent">🏕️</span> UrbanTenants <span>·</span> CampusCrew
         <span class="nav-sub">Beta</span>
     </a>
     <div class="nav-links">
@@ -243,18 +296,21 @@
 </div>
 {% endif %}
 
-<!-- HERO — hardcoded, sirf is page pe -->
+<!-- HERO — hardcoded, 3D depth, sirf is page pe -->
 <section class="hero">
     <div class="hero-mesh"></div>
     <div class="hero-blob blob-1"></div>
     <div class="hero-blob blob-2"></div>
     <div class="hero-blob blob-3"></div>
     <div class="hero-grid"></div>
+    <div class="hero-3d-tent tent-a">🏕️</div>
+    <div class="hero-3d-tent tent-b">⛺</div>
+    <div class="hero-3d-tent tent-c">🏕️</div>
 
     <div class="hero-inner">
         <div class="hero-badge">
             <span class="badge-dot"></span>
-            UrbanTents × CampusCrew &nbsp;—&nbsp; Now Recruiting Nationwide
+            UrbanTenants × CampusCrew &nbsp;—&nbsp; Now Recruiting Nationwide
         </div>
 
         <h1>
